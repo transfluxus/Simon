@@ -51,7 +51,8 @@ class Rect {
   }
   
   void draw() {
-    
+    fill(clr);
+    rect(pos.x,pos.y,rectSz,rectSz);
   }
 }
 
