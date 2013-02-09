@@ -1,3 +1,5 @@
+int blinkTime=300;
+float defaultSize = 0.8f;
 
 class Rect {
 
@@ -42,10 +44,10 @@ class Rect {
     int t = blinkTime - (millis-blinkStartTime);
       if (t<0) {
         blink=false;
-        size=0.8f;
+        size=defaultSize;
       }
-//      else
-//      size = sin(map(blinkTime-t))
+      else
+      size = defaultSize+(1-defaultSize)*sin(map(blinkTime-t,0,blinkTime,0,PI));
     //    size = 0.8f* sin(t/blinkTime * 
     rect(x(), y(), width(), height(), 10);
   }

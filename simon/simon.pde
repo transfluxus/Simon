@@ -3,7 +3,7 @@ import java.util.Collections;
 color[] playerClr= new color[2];
 Rect[] rects;
 
-int millis, blinkTime=100;
+int millis;
 
 int[] playerKeyCount = new int[2];
 
@@ -29,10 +29,11 @@ void initBoard() {
     else
       g.add(2);
   Collections.shuffle(g);
+
   for (int i=0;i < totalGridSz;i++) {
 
-    float size = 0.8f;//0.2 + random(0.8);
-    rects[i] = new Rect(gridPoints[i], g.get(i), playerClr[g.get(i)-1], size, i);
+  //  float size = defaultSize;//0.2 + random(0.8);
+    rects[i] = new Rect(gridPoints[i], g.get(i), playerClr[g.get(i)-1], defaultSize, i);
   }
 }
 
