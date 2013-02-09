@@ -77,17 +77,17 @@ class Rect {
   }
 
   float x() {
-    return pos.x + rectSz*0.5*(1-size);
+	return pos.x + rectSz*0.5*(1-size);
   }
 
   float y() {
-    return pos.y + rectSz*0.5*(1-size);
+	return pos.y + rectSz*0.5*(1-size);
   }
   float width() {
-    return rectSz * size;
+	return rectSz * size;
   }
   float height() {
-    return rectSz * size;
+	return rectSz * size;
   }
 
   void draw() {
