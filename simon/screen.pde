@@ -4,8 +4,10 @@ int w,h;
 int gridW = 3, gridH=2,totalGridSz = gridW*gridH;
 PVector[] gridPoints = new PVector[gridW*gridH];
 
+int rectSz ;
+
 void calcGrid() {
-  int rectSz = displayWidth / gridH;
+  rectSz = displayWidth / gridH;
   int xOff = (displayWidth - (rectSz*gridW))/2;
   for(int x= 0; x < gridW; x++)
   for(int y=0; y <gridH; y++)
