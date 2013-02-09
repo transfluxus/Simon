@@ -36,3 +36,50 @@ class Sequence {
 	return seq.get(ndx);
   }
 }
+
+int sequenceStepTime = 500;
+class SequenceAnimation {
+  Sequence seq;
+  int owner;
+  int index;
+  int startTime;
+  int timer;
+  boolean done;
+  SequenceAnimation( Sequence seq, int player ) {
+      this.seq = seq;
+      this.owner = player;
+      this.index = 0;
+      this.startTime = millis;
+      this.timer = 0;
+      this.done = false;
+  }
+  
+  // returns true when anim finished
+  boolean update() {
+	 if (done) return true;
+     boolean blink = false;
+     if (timer == 0) {
+        blink = true;
+        startTime = millis;
+        timer = 1;
+     }
+     
+     int dt = millis - startTime;
+     startTime = millis;
+     timer = timer + dt;
+     if (timer >= sequenceStepTime) {
+		blink = true;
+		timer -= sequenceStepTime;
+	}
+
+	if (blink) {
+		int rectI = seq.getKey(index);
+                rects[rectIndex(owner, rectI)].blink();
+		index++;
+		if (index == seq.length())
+			done = true;
+	}
+	return done;
+  }
+
+}
