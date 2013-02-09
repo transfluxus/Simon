@@ -19,24 +19,64 @@ public class simon extends PApplet {
 
 
 
-int[] playerClr= new int[2];
+//color[] playerClr= new color[2];
 Rect[] rects;
-Sequence[] sequences = new Sequence[2];
-SequenceAnimation[] sequenceAnimations = new SequenceAnimation[2];
+Sequence[] sequences = new Sequence[4];
+SequenceAnimation[] sequenceAnimations = new SequenceAnimation[4];
 
 int millis;
 
-int[] playerKeyCount = new int[2];
+//int[] playerKeyCount = new int[2];
+//int[] playerScore = new int[2];
+
+Player [] players = new Player[4];
+
+int limitTime = 0;
+int fadeTime = 1000;
+int waitTime = 3000;
+int gameplayLength = 100000; //45000;
+int winner = 0;
+int playerCount = 2;
+
+int gameState = 0;
+// states: 0 - menu, 1 - game, 2 - end
 
 public void setup() {
  
   orientation(LANDSCAPE);
-  playerClr[0]= color(252, 156, 41);
-  playerClr[1]= color(185, 249, 61);
+  //playerClr[0]= color(252, 156, 41);
+  //playerClr[1]= color(185, 249, 61);
+  // 
+  
   // 255, 3, 3
+  initPlayers();
   initBoard();
   initSequences();
   strokeWeight(8);
+}
+
+public void initPlayers() {
+  //Player(color normal, color right, color wrong, color show, color press)
+  //players[0] = new Player(color(255, 255, 38), color(255, 255, 204), color(255, 3, 3), color(255, 253, 179), color(102, 102, 15));
+  //players[1] = new Player(color(255, 38, 128), color(255, 204, 225), color(255, 3, 3), color(255, 89, 158), color(102, 15, 51));
+  //players[2] = new Player(color(38, 204, 255), color(204, 243, 255), color(255, 3, 3), color(89, 216, 255), color(15, 82, 102));
+  //players[3] = new Player(color(110, 255, 38), color(221, 255, 204), color(255, 3, 3), color(144, 255, 89), color(44, 102, 15));
+  
+  
+  //players[0] = new Player(color(255, 255, 38), color(255, 253, 179), color(102, 102, 15), color(255, 253, 179), color(255, 253, 179));
+  //layers[1] = new Player(color(255, 38, 128), color(255, 179, 210), color(102, 15, 51), color(255, 179, 210), color(255, 179, 210));
+ //players[2] = new Player(color(38, 204, 255), color(128, 225, 255), color(15, 82, 102), color(128, 225, 255), color(128, 225, 255));
+ // players[3] = new Player(color(110, 255, 38), color(204, 255, 179), color(44, 102, 15), color(204, 255, 179), color(204, 255, 179));
+  
+  players[0] = new Player(color(255, 255, 38), color(255, 253, 179), color(0, 0, 0), color(255, 253, 179), color(255, 253, 179));
+  players[1] = new Player(color(255, 38, 128), color(255, 179, 210), color(0, 0, 0), color(255, 179, 210), color(255, 179, 210));
+  players[2] = new Player(color(38, 204, 255), color(128, 225, 255), color(0, 0, 0), color(128, 225, 255), color(128, 225, 255));
+  players[3] = new Player(color(110, 255, 38), color(204, 255, 179), color(0, 0, 0), color(204, 255, 179), color(204, 255, 179));
+  
+  
+  players[0].active = true;
+  players[1].active = true;
+
 }
 
 public void initBoard() {
@@ -45,8 +85,8 @@ public void initBoard() {
   boolean[] playerG = new boolean[totalGridSz];
   ArrayList<Integer> g = new ArrayList<Integer>();
 
-  playerKeyCount[0] = PApplet.parseInt(totalGridSz/2);
-  playerKeyCount[1] = totalGridSz - playerKeyCount[0];
+  players[0].squares = PApplet.parseInt(totalGridSz/2);
+  players[1].squares = totalGridSz - players[0].squares;
   for (int i=0;i < totalGridSz;i++) 
     if (i<totalGridSz/2)
       g.add(1);
@@ -54,25 +94,31 @@ public void initBoard() {
       g.add(2);
   Collections.shuffle(g);
 
-  int[] rectCount = new int[2];
+  int[] rectCount = new int[4];
   rectCount[0] = 0;
   rectCount[1] = 0;
+  rectCount[2] = 0;
+  rectCount[3] = 0;
   for (int i=0;i < totalGridSz;i++) {
     int playr = g.get(i);
   //  float size = defaultSize;//0.2 + random(0.8);
-    rects[i] = new Rect(gridPoints[i], playr, playerClr[playr-1], defaultSize, rectCount[playr-1]);
+    rects[i] = new Rect(gridPoints[i], playr, defaultSize, rectCount[playr-1]);
     rectCount[playr-1]++;
   }
 }
 
 public void createSequence(int player) {
-    sequences[player] = new Sequence(4, playerKeyCount[player]);
+    print("squares "+players[player].squares);
+    sequences[player] = new Sequence(4, players[player].squares);
     sequenceAnimations[player] = new SequenceAnimation(sequences[player], player+1);
+    // special: disable 3 and 4 by now
+    if (player>1)
+      sequenceAnimations[player].done = true;
 }
 
 
 public void initSequences() {
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 4; i++) {
       createSequence(i);
   }
 }
@@ -80,18 +126,62 @@ public void initSequences() {
 //void update() {
 //}
 
-public void draw() {
-  //update();
-  int i;
-  background(0);
-  // backwards update because we might delete in-place
-  for (i = sequenceAnimations.length-1; i >= 0; i--)
-	sequenceAnimations[i].update();
+public void restartGame() {
+    // 45 seconds
+    limitTime = millis + gameplayLength;
+    setGameState(1);
+    resetPlayers();
+}
 
-  for (i=0;i < totalGridSz;i++) {
-    rects[i].draw();
-  }
+public void resetPlayers()
+{
+  for (int i=0; i<4; i++)
+    players[i].reset();
+}
+
+public void draw() {
   millis = millis();
+  if (limitTime == 0) {
+    restartGame();
+  }
+  
+  if (gameState == 1 || gameState == 2) {
+  
+    background(0);
+    
+    int i;
+  
+    if (gameState == 1) {
+      // backwards update because we might delete in-place
+      for (i = sequenceAnimations.length-1; i >= 0; i--)
+    	sequenceAnimations[i].update();
+    }
+  
+    for (i=0;i < totalGridSz;i++) {
+      rects[i].draw();
+    }
+    
+    if (millis > limitTime)
+      setGameState(2);
+    
+  }
+  if (gameState == 2) { // endgame
+    // for some time, fade to black
+    float fraction = (millis - limitTime)/(float)fadeTime;
+    fill(0,0,0, 255.0f*fraction);
+    rect(-100, -100, displayWidth + 200, displayHeight + 200);
+    if (millis > limitTime + fadeTime)
+      setGameState(3);
+  }
+  
+  if (gameState == 3) {
+     float fraction = (millis - limitTime - fadeTime)/(float)fadeTime;
+     if (fraction > 1) fraction = 1;
+     int winnerColor = players[winner].normal;
+     fill(red(winnerColor),green(winnerColor),blue(winnerColor), 255*fraction);
+     rect(-100, -100, displayWidth + 200, displayHeight + 200);
+     // SHOW NUMBER?
+  }
 }
 
 public void mousePressed() {
@@ -102,11 +192,15 @@ public void mousePressed() {
 //  int p = (int)random(2);
 //  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
 
-  for (i=0;i < totalGridSz;i++) 
-    if (rects[i].pressed(mouse)) {
-      process(rects[i]);
-      return;
-    }
+  if (gameState == 1) {
+    for (i=0;i < totalGridSz;i++) 
+      if (rects[i].pressed(mouse)) {
+        process(rects[i]);
+        return;
+      }
+  } else if (gameState == 3 && millis > limitTime + 2 * fadeTime) {
+      restartGame();
+  }
 }
 
 
@@ -119,13 +213,14 @@ public void process(Rect rect) {
   if (seq.validKey(rect.id)) {
        rect.showTouched();
        if (seq.completed()) {
-         //allRectsSuccess(rect.player);
-         rect.showSuccess();
+         allRectsSuccess(rect.player);
+         //rect.showSuccess();
+         players[pl].score++;
          createSequence(pl);
        }
   } else {
-    rect.showFail();
-    //allRectsFail(rect.player);
+    //rect.showFail();
+    allRectsFail(rect.player);
     createSequence(pl);
   }
 }
@@ -150,6 +245,57 @@ public void allRectsFail( int player ) {
       if (rects[i].player == player)
           rects[i].showFail();
 }
+
+public void computeWinner() {
+  winner = 0;
+  int winnercount = players[0].score;
+  for (int i = 1; i < playerCount; i++)
+      if (players[i].score >= winnercount) {
+          winnercount = players[i].score;
+          winner = i;
+      }
+}
+
+public void setGameState(int newState) {
+  gameState = newState;
+  
+  if (newState == 2) {
+    computeWinner();  
+  }
+}
+class Player {
+  int normal;
+  int right;
+  int wrong;
+  int show;
+  int press;
+  
+  boolean active;
+  int score;
+  int squares;
+  
+  
+  Player(int normal, int right, int wrong, int show, int press)
+  {
+    this.normal = normal;
+    this.right = right;
+    this.wrong = wrong;
+    this.show = show;
+    this.press = press;
+    reset();
+  }
+  
+  public void reset() {
+    active = false;
+    score = 0;
+    //squares = 0;
+  }
+  
+  public void inc() {
+    score++;
+  }
+
+}
 int blinkTime=300;
 float defaultSize = 0.97f;
 
@@ -157,27 +303,22 @@ class Rect {
 
   PVector pos;
   int player; 
-  int baseColor;
   int clr;
-  int borderClr;
-  boolean touched;
-  boolean success;
-  boolean fail;
-//  int blinkStartTime;
   int time;
   float size;
+  
+  int state;
+  // 0: normal, 1: pressed, 2: show, 3: success, 4: fail
 
   int id;
 
-  Rect(PVector pos, int player, int clr, float size, int id) {
+  Rect(PVector pos, int player, float size, int id) {
 
     this.pos = pos;
     this.player= player;
-    this.baseColor = clr;
-    this.clr = clr;
-    this.borderClr = clr;
     this.size = size;
     this.id = id;
+    this.state = 0;
   }
 
   public float x() {
@@ -195,53 +336,30 @@ class Rect {
   }
   
   public void resetColors() {
-    this.touched = false;
-    this.success = false;
-    this.fail = false;
+    this.state = 0;
     this.time = 0;
   }
   
   public void updateColors() {
-    int currentTime = millis;
-    float baseShade = 0.7f;
-    if (currentTime <= time) {
-      if (fail) {
-        //clr = color(red(baseColor) * baseShade, green(baseColor) * baseShade, blue(baseColor) * baseShade);
-        clr = color(255, 3, 3);
-      } else if (success) {
-        //clr = color(red(baseColor) * baseShade, green(baseColor) * baseShade, blue(baseColor) * baseShade);
-        clr = color(199, 249, 102); //color(3,255,3);
-      } else if (touched) {
-        float timeFraction = (time-currentTime)/(float)blinkTime;
-        float colorFraction = baseShade + (1-baseShade) * pow(timeFraction,0.1f);
-        clr = color(red(baseColor) * colorFraction, green(baseColor) * colorFraction, blue(baseColor) * colorFraction);
-        borderClr = clr;
-      }
-    } else {
-      resetColors();
-      clr = color(red(baseColor) * baseShade, green(baseColor) * baseShade, blue(baseColor) * baseShade);
-      borderClr = clr;
-    }
-
+    if (millis > time)
+      state = 0;
+    
+    if (state == 0)
+      clr = players[player-1].normal;
+    if (state == 1)
+      clr = players[player-1].press;
+    if (state == 2)
+      clr = players[player-1].show;
+    if (state == 3)
+      clr = players[player-1].right;
+    if (state == 4)
+      clr = players[player-1].wrong;
   
   }
 
   public void draw() {
     updateColors();
     fill(clr);
-    //stroke(borderClr);
-    //if (blink)
-    //  fill(clr);
-    //else noFill();
-
-    //int t = blinkTime - (millis-blinkStartTime);
-    //  if (t<0) {
-    //    blink=false;
-    //    size=defaultSize;
-    //  }
-    //  else
-    //  size = defaultSize+(1-defaultSize)*sin(map(blinkTime-t,0,blinkTime,0,PI));
-    //    size = 0.8f* sin(t/blinkTime * 
     rect(x(), y(), width(), height());
   }
 
@@ -256,17 +374,22 @@ class Rect {
   }
 
   public void showTouched() {
-    touched = true;
+    state = 1;
     resetTimer();
   }
   
   public void showSuccess() {
-    success = true;
+    state = 3;
     resetTimer();
   }
   
   public void showFail() {
-    fail = true;
+    state = 4;
+    resetTimer();
+  }
+  
+  public void showShow() {
+    state = 2;
     resetTimer();
   }
 }
@@ -358,7 +481,7 @@ class SequenceAnimation {
 
 	if (blink) {
 		int rectI = seq.getKey(index);
-                rects[rectIndex(owner, rectI)].showTouched();
+                rects[rectIndex(owner, rectI)].showShow();
 		index++;
 		if (index == seq.length())
 			done = true;

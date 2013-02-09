@@ -1,14 +1,10 @@
 import java.util.Collections;
 
-//color[] playerClr= new color[2];
 Rect[] rects;
 Sequence[] sequences = new Sequence[4];
 SequenceAnimation[] sequenceAnimations = new SequenceAnimation[4];
 
 int millis;
-
-//int[] playerKeyCount = new int[2];
-//int[] playerScore = new int[2];
 
 Player [] players = new Player[4];
 
@@ -25,11 +21,7 @@ int gameState = 0;
 void setup() {
   size(displayWidth, displayHeight);
   orientation(LANDSCAPE);
-  //playerClr[0]= color(252, 156, 41);
-  //playerClr[1]= color(185, 249, 61);
-  // 
   
-  // 255, 3, 3
   initPlayers();
   initBoard();
   initSequences();
@@ -49,9 +41,9 @@ void initPlayers() {
  //players[2] = new Player(color(38, 204, 255), color(128, 225, 255), color(15, 82, 102), color(128, 225, 255), color(128, 225, 255));
  // players[3] = new Player(color(110, 255, 38), color(204, 255, 179), color(44, 102, 15), color(204, 255, 179), color(204, 255, 179));
   
-  players[0] = new Player(color(255, 255, 38), color(255, 253, 179), color(0, 0, 0), color(255, 253, 179), color(255, 253, 179));
+  players[2] = new Player(color(255, 255, 38), color(255, 253, 179), color(0, 0, 0), color(255, 253, 179), color(255, 253, 179));
   players[1] = new Player(color(255, 38, 128), color(255, 179, 210), color(0, 0, 0), color(255, 179, 210), color(255, 179, 210));
-  players[2] = new Player(color(38, 204, 255), color(128, 225, 255), color(0, 0, 0), color(128, 225, 255), color(128, 225, 255));
+  players[0] = new Player(color(38, 204, 255), color(128, 225, 255), color(0, 0, 0), color(128, 225, 255), color(128, 225, 255));
   players[3] = new Player(color(110, 255, 38), color(204, 255, 179), color(0, 0, 0), color(204, 255, 179), color(204, 255, 179));
   
   
@@ -82,17 +74,15 @@ void initBoard() {
   rectCount[3] = 0;
   for (int i=0;i < totalGridSz;i++) {
     int playr = g.get(i);
-  //  float size = defaultSize;//0.2 + random(0.8);
     rects[i] = new Rect(gridPoints[i], playr, defaultSize, rectCount[playr-1]);
     rectCount[playr-1]++;
   }
 }
 
 void createSequence(int player) {
-    print("squares "+players[player].squares);
     sequences[player] = new Sequence(4, players[player].squares);
     sequenceAnimations[player] = new SequenceAnimation(sequences[player], player+1);
-    // special: disable 3 and 4 by now
+
     if (player>1)
       sequenceAnimations[player].done = true;
 }
@@ -103,9 +93,6 @@ void initSequences() {
       createSequence(i);
   }
 }
-
-//void update() {
-//}
 
 void restartGame() {
     // 45 seconds
@@ -194,8 +181,8 @@ void process(Rect rect) {
   if (seq.validKey(rect.id)) {
        rect.showTouched();
        if (seq.completed()) {
-         allRectsSuccess(rect.player);
-         //rect.showSuccess();
+         //allRectsSuccess(rect.player);
+         rect.showSuccess();
          players[pl].score++;
          createSequence(pl);
        }
