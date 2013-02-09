@@ -21,7 +21,7 @@ class Player {
   }
   
   void reset() {
-    active = false;
+    //active = false;
     score = 0;
     //squares = 0;
   }

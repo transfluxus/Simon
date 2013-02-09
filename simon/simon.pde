@@ -13,7 +13,7 @@ int fadeTime = 1000;
 int waitTime = 3000;
 int gameplayLength = 45000; //45000;
 int winner = 0;
-int playerCount = 4;
+int playerCount = 2;
 
 int gameState = 0;
 // states: 0 - menu, 1 - game, 2 - end
@@ -54,8 +54,29 @@ void initPlayers() {
   
   players[0].active = true;
   players[1].active = true;
-  players[2].active = true;
+  players[2].active = false;
+  players[3].active = false;
+  
+  validatePlayers();
+}
 
+void validatePlayers() {
+  int countSoFar = 0;
+  for (int i = 0; i < 4; i++) {
+    if (countSoFar == playerCount)
+      players[i].active = false;
+    if (players[i].active)
+      countSoFar++;
+  }
+  
+  if (countSoFar < playerCount) {
+    for (int i=0; i < 4;i++) {
+      if ((!players[i].active) && countSoFar < playerCount) {
+        players[i].active = true;
+        countSoFar++;
+      }
+    }
+  }
 }
 
 void initBoard() {
@@ -65,14 +86,17 @@ void initBoard() {
 
   int squaresPerPlayer = totalGridSz / playerCount;
   int i;
-  for (i = 0; i < playerCount; i++)
+  for (i = 0; i < 4; i++)
     players[i].squares = squaresPerPlayer;
   
-  for (int j=1; j <= playerCount; j++)
-    for (i=0;i < squaresPerPlayer;i++) 
-      g.add(j);
+  for (int j=1; j <= 4; j++) {
+    if (players[j-1].active)
+      for (i=0;i < squaresPerPlayer;i++) {
+        g.add(j);
+      }
+  }
   Collections.shuffle(g);
-
+  
   int[] rectCount = new int[4];
   for (i = 0; i < 4; i++)
     rectCount[i] = 0;
@@ -88,7 +112,7 @@ void createSequence(int player) {
     sequences[player] = new Sequence(3, players[player].squares);
     sequenceAnimations[player] = new SequenceAnimation(sequences[player], player+1);
 
-    if (player >= playerCount)
+    if (!players[player].active)
       sequenceAnimations[player].done = true;
 }
 
@@ -223,9 +247,9 @@ void allRectsFail( int player ) {
 
 void computeWinner() {
   winner = 0;
-  int winnercount = players[0].score;
-  for (int i = 1; i < playerCount; i++)
-      if (players[i].score >= winnercount) {
+  int winnercount = -1;
+  for (int i = 0; i < 4; i++)
+      if (players[i].active && players[i].score >= winnercount) {
           winnercount = players[i].score;
           winner = i;
       }
