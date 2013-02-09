@@ -8,7 +8,7 @@ class Rect {
   color clr;
   int time;
   float size;
-  
+
   int state;
   // 0: normal, 1: pressed, 2: show, 3: success, 4: fail
 
@@ -24,28 +24,28 @@ class Rect {
   }
 
   float x() {
-  return pos.x + rectSz*0.5*(1-size);
+    return pos.x + rectSz*0.5*(1-size);
   }
 
   float y() {
-  return pos.y + rectSz*0.5*(1-size);
+    return pos.y + rectSz*0.5*(1-size);
   }
   float width() {
-  return rectSz * size;
+    return rectSz * size;
   }
   float height() {
-  return rectSz * size;
+    return rectSz * size;
   }
-  
+
   void resetColors() {
     this.state = 0;
     this.time = 0;
   }
-  
+
   void updateColors() {
     if (millis > time)
       state = 0;
-    
+
     if (state == 0)
       clr = players[player-1].normal;
     if (state == 1)
@@ -53,7 +53,7 @@ class Rect {
     if (state == 2)
       clr = players[player-1].show;
     if (state == 3) {
-      boolean blinkState = ((millis - time + 3*blinkTime) % blinkTime) < blinkTime/2;
+      boolean blinkState = ((millis - time + 2*blinkTime) % (blinkTime/2)) < blinkTime/4;
       if (blinkState)
         clr = players[player-1].right;
       else
@@ -61,11 +61,13 @@ class Rect {
     }
     if (state == 4)
       clr = players[player-1].wrong;
-  
   }
 
   void draw() {
-    updateColors();
+    if (gameState==0)
+      clr = players[player-1].press;
+    else
+      updateColors();
     fill(clr);
     rect(x(), y(), width(), height());
   }
@@ -84,20 +86,21 @@ class Rect {
     state = 1;
     resetTimer();
   }
-  
+
   void showSuccess() {
     state = 3;
     resetTimer();
-    time = time + 2*blinkTime;
+    time = time + blinkTime;
   }
-  
+
   void showFail() {
     state = 4;
     resetTimer();
   }
-  
+
   void showShow() {
     state = 2;
     resetTimer();
   }
 }
+
