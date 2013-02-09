@@ -53,7 +53,7 @@ class Rect {
     if (state == 2)
       clr = players[player-1].show;
     if (state == 3) {
-      boolean blinkState = ((millis - time + 3*blinkTime) % blinkTime) < blinkTime/2;
+      boolean blinkState = ((millis - time + 2*blinkTime) % (blinkTime/2)) < blinkTime/4;
       if (blinkState)
         clr = players[player-1].right;
       else
@@ -88,7 +88,7 @@ class Rect {
   void showSuccess() {
     state = 3;
     resetTimer();
-    time = time + 2*blinkTime;
+    time = time + blinkTime;
   }
   
   void showFail() {
