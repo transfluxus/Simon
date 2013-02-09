@@ -30,6 +30,7 @@ void initBoard() {
       g.add(2);
   Collections.shuffle(g);
   for (int i=0;i < totalGridSz;i++) {
+
     float size = 0.8f;//0.2 + random(0.8);
     rects[i] = new Rect(gridPoints[i], g.get(i), playerClr[g.get(i)-1], size, i);
   }
@@ -54,8 +55,10 @@ void mousePressed() {
 }
 
 void process(Rect rect) {
+
   println(rect.player+ " "+rect.id);
   rect.blink();
+
 }
 
 class Rect {
@@ -66,9 +69,11 @@ class Rect {
   boolean blink;
   int blinkStartTime;
   float size;
+
   int id;
 
   Rect(PVector pos, int player, color clr, float size, int id) {
+
     this.pos = pos;
     this.player= player;
     this.clr = clr;
@@ -95,6 +100,7 @@ class Rect {
     if (blink)
       fill(clr);
     else noFill();
+
     int t = blinkTime - (millis-blinkStartTime);
       if (t<0) {
         blink=false;
@@ -111,6 +117,7 @@ class Rect {
     float ty = y();
     return p.x >=tx && p.x <= tx+width() && p.y >=ty && p.y <= ty+height();
   }
+
 
 
   void blink() {
