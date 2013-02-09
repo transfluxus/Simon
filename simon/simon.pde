@@ -1,12 +1,14 @@
 import java.util.Collections;
 
-color player1Clr, player2Clr;
+color[] playerClr= new color[2];
 Rect[] rects;
+
+int millis, blinkTime=200;
 
 void setup() {
   size(displayWidth, displayHeight);
-  player1Clr= color(255, 0, 0);
-  player2Clr=color(0, 0, 255);
+  playerClr[0]= color(255, 0, 0);
+  playerClr[1]=color(0, 0, 255);
   initBoard();
 }
 
@@ -16,18 +18,14 @@ void initBoard() {
   boolean[] playerG = new boolean[totalGridSz];
   ArrayList<Integer> g = new ArrayList<Integer>();
   for (int i=0;i < totalGridSz;i++) 
-    g.add(i);
-  Collections.shuffle(g);
-
-  for (int i=0;i < totalGridSz;i++) {
-    float size = 0.2 + random(0.8);
     if (i<totalGridSz/2)
-      rects[i] = new Rect(gridPoints[i], 1,player1Clr, size);
+      g.add(1);
     else
-      rects[i] = new Rect(gridPoints[i], 2,player2Clr, size);
-    //    playerG[i] = random(1)<0.5;
-    // PVector pos = new PVector(cos(i*div )*r, sin(i* div)*r);
-    //   balls.add(new Ball(i, pos));
+      g.add(2);
+  Collections.shuffle(g);
+  for (int i=0;i < totalGridSz;i++) {
+	float size = 0.2 + random(0.8);
+    rects[i] = new Rect(gridPoints[i], g.get(i), playerClr[g.get(i)-1], size);
   }
 }
 
@@ -37,6 +35,7 @@ void draw() {
   for (int i=0;i < totalGridSz;i++) {
     rects[i].draw();
   }
+  millis = millis();
 }
 
 class Rect {
@@ -44,6 +43,8 @@ class Rect {
   PVector pos;
   int player; 
   color clr;
+  boolean blink;
+  int blinkStartTime;
   float size;
  
   Rect(  PVector pos, int player, color clr, float size) {
@@ -52,10 +53,21 @@ class Rect {
     this.clr = clr;
     this.size = size;
   }
-  
+
   void draw() {
-    fill(clr);
+    stroke(clr);
+    if (blink)
+      fill(clr);
+      else noFill();
     rect(pos.x + rectSz*0.5*(1-size),pos.y + rectSz*0.5*(1-size),rectSz * size,rectSz * size);
+    if(millis-blinkStartTime>blinkTime);
+      blink=false;
+  }
+
+  void blink() {
+    blink=true;
+    blinkStartTime = millis;
   }
 }
+
 
