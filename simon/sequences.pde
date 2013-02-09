@@ -74,7 +74,7 @@ class SequenceAnimation {
 
 	if (blink) {
 		int rectI = seq.getKey(index);
-                rects[rectIndex(owner, rectI)].blink();
+                rects[rectIndex(owner, rectI)].showTouched();
 		index++;
 		if (index == seq.length())
 			done = true;

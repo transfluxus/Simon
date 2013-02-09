@@ -66,9 +66,7 @@ void draw() {
   background(0);
   // backwards update because we might delete in-place
   for (i = sequenceAnimations.length-1; i >= 0; i--)
-	if (sequenceAnimations[i].update()) {
-		//sequenceAnimations.remove(i);
-        }
+	sequenceAnimations[i].update();
 
   for (i=0;i < totalGridSz;i++) {
     rects[i].draw();
@@ -99,11 +97,15 @@ void process(Rect rect) {
   
   Sequence seq = sequences[pl];
   if (seq.validKey(rect.id)) {
-       rect.blink();
+       rect.showTouched();
        if (seq.completed()) {
+         for (int i=0; i<rects.length; i++)
+           if (rects[i].player == rect.player)
+             rects[i].showSuccess();
          createSequence(pl);
        }
   } else {
+    rect.showFail();
     createSequence(pl);
   }
 }
