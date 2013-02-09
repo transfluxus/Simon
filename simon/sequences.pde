@@ -29,7 +29,7 @@ class Sequence {
   int score() { return index; }
   
   // if the sequence was successfully completed
-  boolean completed() { return (index == length() - 1) && !failed; }
+  boolean completed() { return (index == length()) && !failed; }
 
   // for showing it
   int getKey(int ndx) {
@@ -50,7 +50,7 @@ class SequenceAnimation {
       this.owner = player;
       this.index = 0;
       this.startTime = millis;
-      this.timer = 0;
+      this.timer = -1;
       this.done = false;
   }
   
@@ -58,10 +58,10 @@ class SequenceAnimation {
   boolean update() {
 	 if (done) return true;
      boolean blink = false;
-     if (timer == 0) {
-        blink = true;
+     if (timer == -1) {
+        //blink = true;
         startTime = millis;
-        timer = 1;
+        timer = 0;
      }
      
      int dt = millis - startTime;
@@ -81,5 +81,7 @@ class SequenceAnimation {
 	}
 	return done;
   }
+  
+  boolean playing() { return !done; }
 
 }

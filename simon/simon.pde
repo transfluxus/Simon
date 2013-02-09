@@ -2,7 +2,8 @@ import java.util.Collections;
 
 color[] playerClr= new color[2];
 Rect[] rects;
-ArrayList<SequenceAnimation> sequenceAnimations = new ArrayList<SequenceAnimation>();
+Sequence[] sequences = new Sequence[2];
+SequenceAnimation[] sequenceAnimations = new SequenceAnimation[2];
 
 int millis;
 
@@ -14,6 +15,7 @@ void setup() {
   playerClr[1]= color(185, 249, 61);
   // 255, 3, 3
   initBoard();
+  initSequences();
   strokeWeight(8);
 }
 
@@ -43,14 +45,30 @@ void initBoard() {
   }
 }
 
+void createSequence(int player) {
+    sequences[player] = new Sequence(3, playerKeyCount[player]);
+    sequenceAnimations[player] = new SequenceAnimation(sequences[player], player+1);
+}
+
+
+void initSequences() {
+  for (int i = 0; i < 2; i++) {
+      createSequence(i);
+  }
+}
+
+//void update() {
+//}
 
 void draw() {
+  //update();
   int i;
   background(0);
   // backwards update because we might delete in-place
-  for (i = sequenceAnimations.size()-1; i >= 0; i--)
-	if (sequenceAnimations.get(i).update())
-		sequenceAnimations.remove(i);
+  for (i = sequenceAnimations.length-1; i >= 0; i--)
+	if (sequenceAnimations[i].update()) {
+		//sequenceAnimations.remove(i);
+        }
 
   for (i=0;i < totalGridSz;i++) {
     rects[i].draw();
@@ -63,24 +81,31 @@ void mousePressed() {
   PVector mouse = new PVector(mouseX, mouseY);
 
 // test: generate sequence
-  int p = (int)random(2);
-  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
-
-  if (false) {
+//  int p = (int)random(2);
+//  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
 
   for (i=0;i < totalGridSz;i++) 
     if (rects[i].pressed(mouse)) {
       process(rects[i]);
       return;
     }
-  }
 }
 
+
 void process(Rect rect) {
-
-  println(rect.player+ " "+rect.id);
-  rect.blink();
-
+  int pl = rect.player - 1;
+  if (sequenceAnimations[pl].playing())
+    return;
+  
+  Sequence seq = sequences[pl];
+  if (seq.validKey(rect.id)) {
+       rect.blink();
+       if (seq.completed()) {
+         createSequence(pl);
+       }
+  } else {
+    createSequence(pl);
+  }
 }
 
 int rectIndex(int player, int id) {
