@@ -1,11 +1,13 @@
-/*
+
 import apwidgets.*;
 
 APMediaPlayer player;
 
 void initSound() {
   player = new APMediaPlayer(this); //create new APMediaPlayer
-  player.setMediaFile("test.mp3"); //set the file (files are in data folder)
+  player.setMediaFile("S1-C.mp3"); //set the file (files are in data folder)
+  player.start(); //start play back
+    player.setMediaFile("S3-C.mp3"); //set the file (files are in data folder)
   player.start(); //start play back
 //  player.setLooping(true); //restart playback end reached
 //  player.setVolume(1.0, 1.0); //Set left and right volumes. Range is from 0.0 to 1.0
@@ -28,6 +30,7 @@ char note(int tone) {
    case 3: return 'F';
    case 4: return 'G';
    case 5: return 'H';   
+   default: return 'C';
  } 
 }
 
@@ -39,4 +42,4 @@ public void onDestroy() {
   }
 }
 
-*/
+
