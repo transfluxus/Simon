@@ -60,10 +60,10 @@ public void initPlayers() {
  //players[2] = new Player(color(38, 204, 255), color(128, 225, 255), color(15, 82, 102), color(128, 225, 255), color(128, 225, 255));
  // players[3] = new Player(color(110, 255, 38), color(204, 255, 179), color(44, 102, 15), color(204, 255, 179), color(204, 255, 179));
   
-  players[2] = new Player(color(255, 255, 38), color(255, 253, 179), color(0, 0, 0), color(255, 253, 179), color(255, 253, 179));
-  players[1] = new Player(color(255, 38, 128), color(255, 179, 210), color(0, 0, 0), color(255, 179, 210), color(255, 179, 210));
-  players[0] = new Player(color(38, 204, 255), color(128, 225, 255), color(0, 0, 0), color(128, 225, 255), color(128, 225, 255));
-  players[3] = new Player(color(110, 255, 38), color(204, 255, 179), color(0, 0, 0), color(204, 255, 179), color(204, 255, 179));
+  players[0] = new Player(color(38, 204, 255), color(15, 82, 102), color(0, 0, 0), color(15, 82, 102), color(15, 82, 102));
+  players[1] = new Player(color(255, 38, 128), color(102, 15, 51), color(0, 0, 0), color(102, 15, 51), color(102, 15, 51));
+  players[2] = new Player(color(255, 255, 38), color(102, 102, 15), color(0, 0, 0), color(102, 102, 15), color(102, 102, 15));
+  players[3] = new Player(color(110, 255, 38), color(44, 102, 15), color(0, 0, 0), color(44, 102, 15), color(44, 102, 15));
   
   
   players[0].active = true;
@@ -338,7 +338,7 @@ class Rect {
     if (state == 2)
       clr = players[player-1].show;
     if (state == 3) {
-      boolean blinkState = ((millis - time + 3*blinkTime) % blinkTime) < blinkTime/2;
+      boolean blinkState = ((millis - time + 2*blinkTime) % (blinkTime/2)) < blinkTime/4;
       if (blinkState)
         clr = players[player-1].right;
       else
@@ -373,7 +373,7 @@ class Rect {
   public void showSuccess() {
     state = 3;
     resetTimer();
-    time = time + 2*blinkTime;
+    time = time + blinkTime;
   }
   
   public void showFail() {
