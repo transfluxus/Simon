@@ -99,9 +99,10 @@ void process(Rect rect) {
   if (seq.validKey(rect.id)) {
        rect.showTouched();
        if (seq.completed()) {
-         for (int i=0; i<rects.length; i++)
-           if (rects[i].player == rect.player)
-             rects[i].showSuccess();
+         //for (int i=0; i<rects.length; i++)
+         //  if (rects[i].player == rect.player)
+         //    rects[i].showSuccess();
+         rect.showSuccess();
          createSequence(pl);
        }
   } else {

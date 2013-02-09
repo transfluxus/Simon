@@ -37,7 +37,7 @@ class Sequence {
   }
 }
 
-int sequenceStepTime = 500;
+int sequenceStepTime = 1000;
 class SequenceAnimation {
   Sequence seq;
   int owner;

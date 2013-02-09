@@ -56,8 +56,8 @@ class Rect {
       } else if (success) {
         clr = color(3,255,3);
       } else if (touched) {
-        float timeFraction = (time-currentTime)/blinkTime;
-        float colorFraction = baseShade + (1-baseShade) * pow((time-currentTime)/blinkTime,2);
+        float timeFraction = (time-currentTime)/(float)blinkTime;
+        float colorFraction = baseShade + (1-baseShade) * pow(timeFraction,0.1);
         clr = color(red(baseColor) * colorFraction, green(baseColor) * colorFraction, blue(baseColor) * colorFraction);
       }
     } else {
