@@ -5,27 +5,22 @@ class Rect {
 
   PVector pos;
   int player; 
-  color baseColor;
   color clr;
-  color borderClr;
-  boolean touched;
-  boolean success;
-  boolean fail;
-//  int blinkStartTime;
   int time;
   float size;
+  
+  int state;
+  // 0: normal, 1: pressed, 2: show, 3: success, 4: fail
 
   int id;
 
-  Rect(PVector pos, int player, color clr, float size, int id) {
+  Rect(PVector pos, int player, float size, int id) {
 
     this.pos = pos;
     this.player= player;
-    this.baseColor = clr;
-    this.clr = clr;
-    this.borderClr = clr;
     this.size = size;
     this.id = id;
+    this.state = 0;
   }
 
   float x() {
@@ -43,53 +38,30 @@ class Rect {
   }
   
   void resetColors() {
-    this.touched = false;
-    this.success = false;
-    this.fail = false;
+    this.state = 0;
     this.time = 0;
   }
   
   void updateColors() {
-    int currentTime = millis;
-    float baseShade = 0.7;
-    if (currentTime <= time) {
-      if (fail) {
-        //clr = color(red(baseColor) * baseShade, green(baseColor) * baseShade, blue(baseColor) * baseShade);
-        clr = color(255, 3, 3);
-      } else if (success) {
-        //clr = color(red(baseColor) * baseShade, green(baseColor) * baseShade, blue(baseColor) * baseShade);
-        clr = color(199, 249, 102); //color(3,255,3);
-      } else if (touched) {
-        float timeFraction = (time-currentTime)/(float)blinkTime;
-        float colorFraction = baseShade + (1-baseShade) * pow(timeFraction,0.1);
-        clr = color(red(baseColor) * colorFraction, green(baseColor) * colorFraction, blue(baseColor) * colorFraction);
-        borderClr = clr;
-      }
-    } else {
-      resetColors();
-      clr = color(red(baseColor) * baseShade, green(baseColor) * baseShade, blue(baseColor) * baseShade);
-      borderClr = clr;
-    }
-
+    if (millis > time)
+      state = 0;
+    
+    if (state == 0)
+      clr = players[player-1].normal;
+    if (state == 1)
+      clr = players[player-1].press;
+    if (state == 2)
+      clr = players[player-1].show;
+    if (state == 3)
+      clr = players[player-1].right;
+    if (state == 4)
+      clr = players[player-1].wrong;
   
   }
 
   void draw() {
     updateColors();
     fill(clr);
-    //stroke(borderClr);
-    //if (blink)
-    //  fill(clr);
-    //else noFill();
-
-    //int t = blinkTime - (millis-blinkStartTime);
-    //  if (t<0) {
-    //    blink=false;
-    //    size=defaultSize;
-    //  }
-    //  else
-    //  size = defaultSize+(1-defaultSize)*sin(map(blinkTime-t,0,blinkTime,0,PI));
-    //    size = 0.8f* sin(t/blinkTime * 
     rect(x(), y(), width(), height());
   }
 
@@ -104,17 +76,22 @@ class Rect {
   }
 
   void showTouched() {
-    touched = true;
+    state = 1;
     resetTimer();
   }
   
   void showSuccess() {
-    success = true;
+    state = 3;
     resetTimer();
   }
   
   void showFail() {
-    fail = true;
+    state = 4;
+    resetTimer();
+  }
+  
+  void showShow() {
+    state = 2;
     resetTimer();
   }
 }
