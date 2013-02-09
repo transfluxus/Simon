@@ -26,6 +26,7 @@ void setup() {
   initBoard();
   initSequences();
   strokeWeight(8);
+  initSound();
 }
 
 void initPlayers() {
