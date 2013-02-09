@@ -8,11 +8,17 @@ SequenceAnimation[] sequenceAnimations = new SequenceAnimation[2];
 int millis;
 
 int[] playerKeyCount = new int[2];
+int[] playerScore = new int[2];
+
+int remainingTime = 0;
 
 void setup() {
   size(displayWidth, displayHeight);
+  orientation(LANDSCAPE);
   playerClr[0]= color(252, 156, 41);
   playerClr[1]= color(185, 249, 61);
+  // 
+  
   // 255, 3, 3
   initBoard();
   initSequences();
@@ -43,10 +49,13 @@ void initBoard() {
     rects[i] = new Rect(gridPoints[i], playr, playerClr[playr-1], defaultSize, rectCount[playr-1]);
     rectCount[playr-1]++;
   }
+  
+  playerScore[0] = 0;
+  playerScore[1] = 0;
 }
 
 void createSequence(int player) {
-    sequences[player] = new Sequence(3, playerKeyCount[player]);
+    sequences[player] = new Sequence(4, playerKeyCount[player]);
     sequenceAnimations[player] = new SequenceAnimation(sequences[player], player+1);
 }
 
@@ -60,7 +69,16 @@ void initSequences() {
 //void update() {
 //}
 
+void restartGame() {
+}
+
 void draw() {
+  millis = millis();
+  
+  if (millis > remainingTime) {
+    restartGame();
+  }
+  
   //update();
   int i;
   background(0);
@@ -71,7 +89,6 @@ void draw() {
   for (i=0;i < totalGridSz;i++) {
     rects[i].draw();
   }
-  millis = millis();
 }
 
 void mousePressed() {
@@ -99,14 +116,14 @@ void process(Rect rect) {
   if (seq.validKey(rect.id)) {
        rect.showTouched();
        if (seq.completed()) {
-         //for (int i=0; i<rects.length; i++)
-         //  if (rects[i].player == rect.player)
-         //    rects[i].showSuccess();
+         //allRectsSuccess(rect.player);
          rect.showSuccess();
+         playerScore[pl]++;
          createSequence(pl);
        }
   } else {
     rect.showFail();
+    //allRectsFail(rect.player);
     createSequence(pl);
   }
 }
@@ -120,3 +137,14 @@ int rectIndex(int player, int id) {
   return -1;
 }
 
+void allRectsSuccess( int player ) {
+   for (int i=0; i<rects.length; i++)
+      if (rects[i].player == player)
+          rects[i].showSuccess();
+}
+
+void allRectsFail( int player ) {
+   for (int i=0; i<rects.length; i++)
+      if (rects[i].player == player)
+          rects[i].showFail();
+}

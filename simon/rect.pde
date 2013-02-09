@@ -1,5 +1,5 @@
 int blinkTime=300;
-float defaultSize = 0.8f;
+float defaultSize = 0.97f;
 
 class Rect {
 
@@ -7,6 +7,7 @@ class Rect {
   int player; 
   color baseColor;
   color clr;
+  color borderClr;
   boolean touched;
   boolean success;
   boolean fail;
@@ -22,6 +23,7 @@ class Rect {
     this.player= player;
     this.baseColor = clr;
     this.clr = clr;
+    this.borderClr = clr;
     this.size = size;
     this.id = id;
   }
@@ -52,17 +54,21 @@ class Rect {
     float baseShade = 0.7;
     if (currentTime <= time) {
       if (fail) {
+        //clr = color(red(baseColor) * baseShade, green(baseColor) * baseShade, blue(baseColor) * baseShade);
         clr = color(255, 3, 3);
       } else if (success) {
-        clr = color(3,255,3);
+        //clr = color(red(baseColor) * baseShade, green(baseColor) * baseShade, blue(baseColor) * baseShade);
+        clr = color(199, 249, 102); //color(3,255,3);
       } else if (touched) {
         float timeFraction = (time-currentTime)/(float)blinkTime;
         float colorFraction = baseShade + (1-baseShade) * pow(timeFraction,0.1);
         clr = color(red(baseColor) * colorFraction, green(baseColor) * colorFraction, blue(baseColor) * colorFraction);
+        borderClr = clr;
       }
     } else {
       resetColors();
       clr = color(red(baseColor) * baseShade, green(baseColor) * baseShade, blue(baseColor) * baseShade);
+      borderClr = clr;
     }
 
   
@@ -71,7 +77,7 @@ class Rect {
   void draw() {
     updateColors();
     fill(clr);
-    //stroke(clr);
+    //stroke(borderClr);
     //if (blink)
     //  fill(clr);
     //else noFill();
@@ -84,7 +90,7 @@ class Rect {
     //  else
     //  size = defaultSize+(1-defaultSize)*sin(map(blinkTime-t,0,blinkTime,0,PI));
     //    size = 0.8f* sin(t/blinkTime * 
-    rect(x(), y(), width(), height(), 25);
+    rect(x(), y(), width(), height());
   }
 
   boolean pressed(PVector p) {

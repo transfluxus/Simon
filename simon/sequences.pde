@@ -37,39 +37,31 @@ class Sequence {
   }
 }
 
-int sequenceStepTime = 1000;
+int sequenceStepTime = 500;
+int sequenceStartTime = 1200;
 class SequenceAnimation {
   Sequence seq;
   int owner;
   int index;
-  int startTime;
+  int switchTime;
   int timer;
   boolean done;
   SequenceAnimation( Sequence seq, int player ) {
       this.seq = seq;
       this.owner = player;
       this.index = 0;
-      this.startTime = millis;
-      this.timer = -1;
+      this.switchTime = millis + sequenceStartTime;
       this.done = false;
   }
   
   // returns true when anim finished
   boolean update() {
-	 if (done) return true;
+    if (done) return true;
      boolean blink = false;
-     if (timer == -1) {
-        //blink = true;
-        startTime = millis;
-        timer = 0;
-     }
      
-     int dt = millis - startTime;
-     startTime = millis;
-     timer = timer + dt;
-     if (timer >= sequenceStepTime) {
+     if (millis >= switchTime) {
 		blink = true;
-		timer -= sequenceStepTime;
+		switchTime += sequenceStepTime;
 	}
 
 	if (blink) {

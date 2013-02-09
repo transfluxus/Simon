@@ -1,7 +1,7 @@
 int w, h;
 
 //int totalrectSz = 0.8f;
-int gridW = 3, gridH = 2, totalGridSz = gridW*gridH;
+int gridW = 4, gridH = 3, totalGridSz = gridW*gridH;
 PVector[] gridPoints = new PVector[gridW*gridH];
 
 int rectSz ;
