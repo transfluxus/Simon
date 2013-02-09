@@ -13,7 +13,7 @@ int fadeTime = 1000;
 int waitTime = 3000;
 int gameplayLength = 45000; //45000;
 int winner = 0;
-int playerCount = 0;
+int playerCount = 2;
 
 int gameState = 0;
 // states: 0 - menu, 1 - game, 2 - end
@@ -24,56 +24,79 @@ void setup() {
 
 
   initPlayers();
+  
   initBoard();
   initMenu();
   initSequences();
+  restartGame();
   strokeWeight(8);
 }
 
 void initPlayers() {
   //Player(color normal, color right, color wrong, color show, color press)
-  //players[0] = new Player(color(255, 255, 38), color(255, 255, 204), color(255, 3, 3), color(255, 253, 179), color(102, 102, 15));
-  //players[1] = new Player(color(255, 38, 128), color(255, 204, 225), color(255, 3, 3), color(255, 89, 158), color(102, 15, 51));
-  //players[2] = new Player(color(38, 204, 255), color(204, 243, 255), color(255, 3, 3), color(89, 216, 255), color(15, 82, 102));
-  //players[3] = new Player(color(110, 255, 38), color(221, 255, 204), color(255, 3, 3), color(144, 255, 89), color(44, 102, 15));
-
-
-  //players[0] = new Player(color(255, 255, 38), color(255, 253, 179), color(102, 102, 15), color(255, 253, 179), color(255, 253, 179));
-  //layers[1] = new Player(color(255, 38, 128), color(255, 179, 210), color(102, 15, 51), color(255, 179, 210), color(255, 179, 210));
-  //players[2] = new Player(color(38, 204, 255), color(128, 225, 255), color(15, 82, 102), color(128, 225, 255), color(128, 225, 255));
-  // players[3] = new Player(color(110, 255, 38), color(204, 255, 179), color(44, 102, 15), color(204, 255, 179), color(204, 255, 179));
+ 
+  // "normal" is the normal color
+  // "right" is the blinking with the last correct square of the sequence
+  // "wrong" is when a wrong square is pressed
+  // "show" is what the computer shows to the player
+  // "press" is when the user presses a (correct) button mid-sequence
+  //Player(color normal, color right, color wrong, color show, color press)
 
   players[0] = new Player(color(38, 204, 255), color(15, 82, 102), color(0, 0, 0), color(15, 82, 102), color(15, 82, 102));
   players[1] = new Player(color(255, 38, 128), color(102, 15, 51), color(0, 0, 0), color(102, 15, 51), color(102, 15, 51));
   players[2] = new Player(color(255, 255, 38), color(102, 102, 15), color(0, 0, 0), color(102, 102, 15), color(102, 102, 15));
   players[3] = new Player(color(110, 255, 38), color(44, 102, 15), color(0, 0, 0), color(44, 102, 15), color(44, 102, 15));
 
-
   players[0].active = true;
   players[1].active = true;
+  players[2].active = false;
+  players[3].active = false;
+  
+  validatePlayers();
+}
+
+void validatePlayers() {
+  int countSoFar = 0;
+  for (int i = 0; i < 4; i++) {
+    if (countSoFar == playerCount)
+      players[i].active = false;
+    if (players[i].active)
+      countSoFar++;
+  }
+  
+  if (countSoFar < playerCount) {
+    for (int i=0; i < 4;i++) {
+      if ((!players[i].active) && countSoFar < playerCount) {
+        players[i].active = true;
+        countSoFar++;
+      }
+    }
+  }
 }
 
 void initBoard() {
   rects =new Rect[totalGridSz];
   calcGrid();
-  boolean[] playerG = new boolean[totalGridSz];
   ArrayList<Integer> g = new ArrayList<Integer>();
 
-  players[0].squares = int(totalGridSz/2);
-  players[1].squares = totalGridSz - players[0].squares;
-  for (int i=0;i < totalGridSz;i++) 
-    if (i<totalGridSz/2)
-      g.add(1);
-    else
-      g.add(2);
+  int squaresPerPlayer = totalGridSz / playerCount;
+  int i;
+  for (i = 0; i < 4; i++)
+    players[i].squares = squaresPerPlayer;
+  
+  for (int j=1; j <= 4; j++) {
+    if (players[j-1].active)
+      for (i=0;i < squaresPerPlayer;i++) {
+        g.add(j);
+      }
+  }
   Collections.shuffle(g);
-
+  
   int[] rectCount = new int[4];
-  rectCount[0] = 0;
-  rectCount[1] = 0;
-  rectCount[2] = 0;
-  rectCount[3] = 0;
-  for (int i=0;i < totalGridSz;i++) {
+  for (i = 0; i < 4; i++)
+    rectCount[i] = 0;
+  
+  for (i=0; i < totalGridSz; i++) {
     int playr = g.get(i);
     rects[i] = new Rect(gridPoints[i], playr, defaultSize, rectCount[playr-1]);
     rectCount[playr-1]++;
@@ -81,11 +104,11 @@ void initBoard() {
 }
 
 void createSequence(int player) {
-  sequences[player] = new Sequence(4, players[player].squares);
-  sequenceAnimations[player] = new SequenceAnimation(sequences[player], player+1);
+    sequences[player] = new Sequence(3, players[player].squares);
+    sequenceAnimations[player] = new SequenceAnimation(sequences[player], player+1);
 
-  if (player>1)
-    sequenceAnimations[player].done = true;
+    if (!players[player].active)
+      sequenceAnimations[player].done = true;
 }
 
 
@@ -110,10 +133,13 @@ void initMenu() {
 }
 
 void restartGame() {
-  // 45 seconds
-  limitTime = millis + gameplayLength;
-  setGameState(1);
-  resetPlayers();
+
+    // 45 seconds
+    limitTime = millis + gameplayLength;
+    setGameState(1);
+    resetPlayers();
+    initBoard();
+    initSequences();
 }
 
 void resetPlayers()
@@ -241,12 +267,12 @@ void allRectsFail( int player ) {
 
 void computeWinner() {
   winner = 0;
-  int winnercount = players[0].score;
-  for (int i = 1; i < playerCount; i++)
-    if (players[i].score >= winnercount) {
-      winnercount = players[i].score;
-      winner = i;
-    }
+  int winnercount = -1;
+  for (int i = 0; i < 4; i++)
+      if (players[i].active && players[i].score >= winnercount) {
+          winnercount = players[i].score;
+          winner = i;
+      }
 }
 
 void setGameState(int newState) {
