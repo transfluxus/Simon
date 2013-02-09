@@ -20,8 +20,8 @@ void initBoard() {
   boolean[] playerG = new boolean[totalGridSz];
   ArrayList<Integer> g = new ArrayList<Integer>();
 
-  playerKeyCount[1] = int(totalGridSz/2;
-  playerKeyCount[2] = totalGridSz - playerKeyCount[1];
+  playerKeyCount[0] = int(totalGridSz/2);
+  playerKeyCount[1] = totalGridSz - playerKeyCount[0];
   for (int i=0;i < totalGridSz;i++) 
     if (i<totalGridSz/2)
       g.add(1);
@@ -59,17 +59,17 @@ class Rect {
     this.size = size;
   }
 
-  void x() {
+  float x() {
 	return pos.x + rectSz*0.5*(1-size);
   }
 
-  void y() {
+  float y() {
 	return pos.y + rectSz*0.5*(1-size);
   }
-  void width() {
+  float width() {
 	return rectSz * size;
   }
-  void height() {
+  float height() {
 	return rectSz * size;
   }
 
