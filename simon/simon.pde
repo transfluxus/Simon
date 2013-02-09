@@ -47,7 +47,7 @@ class Rect {
   Rect(  PVector pos, int player,color clr) {
     this.pos = pos;
     this.player= player;
-    this.clr = 
+    this.clr = clr;
   }
   
   void draw() {
