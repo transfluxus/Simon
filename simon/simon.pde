@@ -20,10 +20,11 @@ void initBoard() {
   Collections.shuffle(g);
 
   for (int i=0;i < totalGridSz;i++) {
+    float size = 0.2 + random(0.8);
     if (i<totalGridSz/2)
-      rects[i] = new Rect(gridPoints[i], 1,player1Clr);
+      rects[i] = new Rect(gridPoints[i], 1,player1Clr, size);
     else
-      rects[i] = new Rect(gridPoints[i], 2,player2Clr);
+      rects[i] = new Rect(gridPoints[i], 2,player2Clr, size);
     //    playerG[i] = random(1)<0.5;
     // PVector pos = new PVector(cos(i*div )*r, sin(i* div)*r);
     //   balls.add(new Ball(i, pos));
@@ -42,17 +43,19 @@ class Rect {
 
   PVector pos;
   int player; 
- color clr;
+  color clr;
+  float size;
  
-  Rect(  PVector pos, int player,color clr) {
+  Rect(  PVector pos, int player, color clr, float size) {
     this.pos = pos;
     this.player= player;
     this.clr = clr;
+    this.size = size;
   }
   
   void draw() {
     fill(clr);
-    rect(pos.x,pos.y,rectSz,rectSz);
+    rect(pos.x + rectSz*0.5*(1-size),pos.y + rectSz*0.5*(1-size),rectSz * size,rectSz * size);
   }
 }
 
