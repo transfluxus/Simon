@@ -110,9 +110,7 @@ void initBoard() {
 void createSequence(int player) {
   sequences[player] = new Sequence(3, players[player].squares);
   sequenceAnimations[player] = new SequenceAnimation(sequences[player], player+1);
-
-  if (!players[player].active)
-    sequenceAnimations[player].done = true;
+  sequenceAnimations[player].enabled = players[player].active;
 }
 
 
@@ -150,6 +148,7 @@ void restartGame() {
   limitTime = millis + gameplayLength;
   setGameState(1);
   resetPlayers();
+  validatePlayers();
   initBoard();
   initSequences();
 }
@@ -217,7 +216,7 @@ void draw() {
     if (millis > limitTime)
       setGameState(2);
   }
-  else if (gameState == 2) { // endgame
+  if (gameState == 2) { // endgame
     // for some time, fade to black
     float fraction = (millis - limitTime)/(float)fadeTime;
     fill(0, 0, 0, 255.0*fraction);
@@ -226,7 +225,7 @@ void draw() {
       setGameState(3);
   }
 
-  else if (gameState == 3) {
+  if (gameState == 3) {
     float fraction = (millis - limitTime - fadeTime)/(float)fadeTime;
     if (fraction > 1) fraction = 1;
     color winnerColor = players[winner].normal;
@@ -255,31 +254,25 @@ void mousePressed() {
         else ready--;
       }
   }
-  // test: generate sequence
-  //  int p = (int)random(2);
-  //  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
-
-  if (baseShape == 1) { // diamonds: rotate board 45 degrees
-    PVector offs = new PVector(displayWidth/2, displayHeight/2);
-    mouse.sub(offs);		
-    mouse.mult(1/boardScale);
-    mouse.rotate(PI/4.0);
-    mouse.add(offs);
-  }
-
-  // test: generate sequence
-  //  int p = (int)random(2);
-  //  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
 
   if (gameState == 1) {
+    pushMatrix();
+    if (baseShape == 1) { // diamonds: rotate board 45 degrees
+		PVector offs = new PVector(displayWidth/2, displayHeight/2);
+		mouse.sub(offs);		
+		mouse.mult(1/boardScale);
+		mouse.rotate(PI/4.0);
+		mouse.add(offs);		
+	}
     for (i=0;i < totalGridSz;i++) 
       if (rects[i].pressed(mouse)) {
         process(rects[i]);
         return;
       }
+    popMatrix();
   } 
   else if (gameState == 3 && millis > limitTime + 2 * fadeTime) {
-    restartGame();
+    setGameState(-1);
   }
 }
 
@@ -296,6 +289,7 @@ void process(Rect rect) {
     return;
 
   Sequence seq = sequences[pl];
+  sequenceAnimations[pl].delayRepeat();
   if (seq.validKey(rect.id)) {
     rect.showTouched();
     if (seq.completed()) {
@@ -350,4 +344,15 @@ void setGameState(int newState) {
     computeWinner();
   }
 }
+
+/*
+public boolean surfaceTouchEvent(MotionEvent event) {
+
+  //call to keep mouseX, mouseY, etc updated
+  super.surfaceTouchEvent(event);
+
+  //forward event to class for processing
+  return gesture.surfaceTouchEvent(event);
+}
+*/
 
