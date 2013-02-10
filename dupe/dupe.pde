@@ -107,9 +107,7 @@ void initBoard() {
 void createSequence(int player) {
   sequences[player] = new Sequence(3, players[player].squares);
   sequenceAnimations[player] = new SequenceAnimation(sequences[player], player+1);
-
-  if (!players[player].active)
-    sequenceAnimations[player].done = true;
+  sequenceAnimations[player].enabled = players[player].active;
 }
 
 
@@ -131,7 +129,6 @@ void initMenu() {
   int xOff = (width-height)/2;
   for (int i=0; i < 4;i++) 
     initRects[i] = new Rect(new PVector(), i+1, defaultSize*0.7, 0);
-  println(height+ "/ "+(height-t*3- initRects[3].height()) + "  "+  initRects[3].height());
   initRects[0].pos.set(xOff+t, t, 0);
   initRects[1].pos.set(width-xOff-t-initRects[1].width(), t, 0);
   initRects[2].pos.set(xOff+t, height-t-initRects[2].height(), 0);
@@ -204,11 +201,11 @@ void draw() {
       rects[i].draw();
     }
     
-	popMatrix();
+    popMatrix();
     if (millis > limitTime)
       setGameState(2);
   }
-  else if (gameState == 2) { // endgame
+  if (gameState == 2) { // endgame
     // for some time, fade to black
     float fraction = (millis - limitTime)/(float)fadeTime;
     fill(0, 0, 0, 255.0*fraction);
@@ -217,7 +214,7 @@ void draw() {
       setGameState(3);
   }
 
-  else if (gameState == 3) {
+  if (gameState == 3) {
     float fraction = (millis - limitTime - fadeTime)/(float)fadeTime;
     if (fraction > 1) fraction = 1;
     color winnerColor = players[winner].normal;
@@ -292,6 +289,7 @@ void process(Rect rect) {
     return;
 
   Sequence seq = sequences[pl];
+  sequenceAnimations[pl].delayRepeat();
   if (seq.validKey(rect.id)) {
     rect.showTouched();
     if (seq.completed()) {
