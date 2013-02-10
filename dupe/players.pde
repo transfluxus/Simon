@@ -9,7 +9,6 @@ class Player {
   int score;
   int squares;
   
-  boolean ready;
   
   Player(color normal, color right, color wrong, color show, color press)
   {

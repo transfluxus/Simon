@@ -63,7 +63,6 @@ class SequenceAnimation {
 		blink = true;
 		switchTime += sequenceStepTime;
 	}
-
 	if (blink) {
 		int rectI = seq.getKey(index);
                 rects[rectIndex(owner, rectI)].showShow();

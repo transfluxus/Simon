@@ -15,7 +15,7 @@ class Rect {
 
   int id;
 
-  int selectTime = -1;
+  boolean selected;
 
   Rect(PVector pos, int player, float size, int id) {
     this.pos = pos;
@@ -66,16 +66,17 @@ class Rect {
   }
 
   void draw() {
-    if (gameState==0)
-      clr = players[player-1].press;
+    if (gameState==0) {
+      if (selected)
+        clr = players[player-1].normal;
+      else
+        clr = players[player-1].press;
+    }
     else
       updateColors();
     fill(clr);
     noStroke();
     rect(x(), y(), width(), height());
-    if (gameState==0) {
-      showSelect();
-    }
   }
 
   boolean pressed(PVector p) {
@@ -107,20 +108,6 @@ class Rect {
   void showShow() {
     state = 2;
     resetTimer();
-  }
-
-  void showSelect() {
-    if (selectTime>=0) {
-      float      s = map(millis-selectTime, 0, selectTimeT, 0, width());
-      s = min(s, width() );
-      rectMode(CENTER);
-      noStroke();
-      fill(players[player-1].normal);
-      rect(x()+width() / 2, y()+ height()/2, s, s );
-      rectMode(CORNER);
-      selectTime++;
-      players[player-1].ready = ( millis-selectTime >selectTimeT);
-    }
   }
 }
 

@@ -15,17 +15,17 @@ class Button {
   }
 
   float x() {
-    return pos.x + rectSz*0.5*(1-size);
+    return pos.x + img.width*0.5*(1-size);
   }
 
   float y() {
-    return pos.y + rectSz*0.5*(1-size);
+    return pos.y + img.height*0.5*(1-size);
   }
   float width() {
-    return rectSz * size;
+    return img.width * size;
   }
   float height() {
-    return rectSz * size;
+    return img.height * size;
   }
 
   void draw() {
@@ -35,7 +35,7 @@ class Button {
   boolean pressed(PVector p) {
     float tx = x();
     float ty = y();
-    return p.x >=tx && p.x <= tx+width() && p.y >=ty && p.y <= ty+height();
+    return p.x >=tx-width()/2 && p.x <= tx+width()/2 && p.y >=ty-height/2 && p.y <= ty+height()/2;
   }
 }
 

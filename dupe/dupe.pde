@@ -1,7 +1,8 @@
 import java.util.Collections;
-import ketai.ui.*;
 
-KetaiGesture gesture;
+//import ketai.ui.*;
+
+// KetaiGesture gesture;
 
 Rect[] rects;
 Sequence[] sequences = new Sequence[4];
@@ -16,16 +17,18 @@ int fadeTime = 1000;
 int waitTime = 3000;
 int gameplayLength = 45000; //45000;
 int winner = 0;
-int playerCount = 1;
+int playerCount = 4;
 
 int gameState = -1;
 // states: -1 - intro screen, 0 - color select/check ready, 1 - game, 2 - end
+int ready=0;
+PImage titleImage, tapColor;
 
 void setup() {
   size(displayWidth, displayHeight);
   orientation(LANDSCAPE);
 
-gesture = new KetaiGesture(this);
+  // gesture = new KetaiGesture(this);
 
   initPlayers();
   initBoard();
@@ -123,25 +126,29 @@ Rect[] initRects = new Rect[4];
 Button[] button = new Button[3];
 
 void initMenu() {
-  button[0] = new Button(new PVector(width/2-(rectSz+10), height/2), 2, 0.4, "2p.png");  
-  button[1] = new Button(new PVector(button[0].x()+button[0].width(), height/2), 3, 0.4, "3p.png");
-  button[2] = new Button(new PVector(button[1].x()+button[1].width(), height/2), 4, 0.4, "4p.png");
+  button[0] = new Button(new PVector(width/3, height- height/3f), 2, 1f, "2p.png");  
+  button[1] = new Button(new PVector(width/2, height- height/3f), 3, 1f, "3p.png");
+  button[2] = new Button(new PVector(width - width/3, height- height/3f), 4, 1f, "4p.png");
+
+  titleImage = loadImage("dupeTitle.png");
+  tapColor = loadImage("tap_your_colour.png"); 
+  for (int i=0; i < 4;i++) 
+    initRects[i] = new Rect(new PVector(), i+1, defaultSize*1.4, 0);
 
   int t = 10;
-  int xOff = (width-height)/2;
-  for (int i=0; i < 4;i++) 
-    initRects[i] = new Rect(new PVector(), i+1, defaultSize*0.7, 0);
-  println(height+ "/ "+(height-t*3- initRects[3].height()) + "  "+  initRects[3].height());
-  initRects[0].pos.set(xOff+t, t, 0);
-  initRects[1].pos.set(width-xOff-t-initRects[1].width(), t, 0);
-  initRects[2].pos.set(xOff+t, height-t-initRects[2].height(), 0);
-  initRects[3].pos.set(width-xOff-t - initRects[3].width(), height-t- initRects[3].height(), 0);
+  float xOff = width/3f;
+  initRects[0].pos.set(xOff, t, 0);
+  float xOff2 = xOff + initRects[3].width() + t*2;
+
+  initRects[1].pos.set(xOff2, t, 0);
+  initRects[2].pos.set(xOff, height-t-initRects[2].height(), 0);
+  initRects[3].pos.set(xOff2, height-t- initRects[3].height(), 0);
 }
 
 void restartGame() {
   // 45 seconds
   limitTime = millis + gameplayLength;
-  setGameState(0);
+  setGameState(1);
   resetPlayers();
   initBoard();
   initSequences();
@@ -155,30 +162,32 @@ void resetPlayers()
 
 void draw() {
   millis = millis();
-
   /*  if (limitTime == 0) {
    restartGame();
    }
    */
   if (gameState == -1) {
     background(0);
-    textSize(40);
-    textAlign(CENTER, CENTER);
-    text("DUPE", width/2, height/2);
+    imageMode(CENTER);
+    int wi = titleImage.width;
+    int hi= titleImage.height;
+    float scale = titleImage.height / (height/3f);
+    image(titleImage, width/2, height/10+titleImage.height/2, scale*wi, scale*hi);
     for (int i=0; i < 3;i++)
       button[i].draw();
   }
   else if (gameState== 0) {
     background(0);
-    int ready=0;
-    for (int i=0; i < 4;i++) {
+    imageMode(CORNER);
+    int wi = tapColor.width;
+    int hi= tapColor.height;
+    float scale = titleImage.height / (height/2f);
+    image(tapColor, 10, height/2, scale*wi, scale*hi);
+    for (int i=0; i < 4;i++) 
       initRects[i].draw();
-      if (players[i].ready)
-        ready++;
-    }
-    println("ready "+ready);
+    //        println("ready "+ready + " / wait for "+playerCount);
     if (ready==playerCount)
-      gameState=1;
+      restartGame();
   } 
   else if (gameState == 1 || gameState == 2) {
 
@@ -191,20 +200,20 @@ void draw() {
       for (i = sequenceAnimations.length-1; i >= 0; i--)
         sequenceAnimations[i].update();
     }
-  
-	pushMatrix();
-	if (baseShape == 1) { // diamonds: rotate board 45 degrees
-		translate(displayWidth/2, displayHeight/2);		
-		scale(boardScale);
-		rotate(-PI/4.0);
-		translate(-displayWidth/2, -displayHeight/2);		
-	}
+
+    pushMatrix();
+    if (baseShape == 1) { // diamonds: rotate board 45 degrees
+      translate(displayWidth/2, displayHeight/2);		
+      scale(boardScale);
+      rotate(-PI/4.0);
+      translate(-displayWidth/2, -displayHeight/2);
+    }
 
     for (i=0;i < totalGridSz;i++) {
       rects[i].draw();
     }
-    
-	popMatrix();
+
+    popMatrix();
     if (millis > limitTime)
       setGameState(2);
   }
@@ -235,29 +244,32 @@ void mousePressed() {
       if (button[i].pressed(mouse)) {
         playerCount=i+2;
         gameState=0;
-        println(i);
       }
   }
   else if (gameState == 0) {
     for (int j=0; j<4;j++)
-      if (initRects[j].pressed(mouse))
-        initRects[j].selectTime = millis;
+      if (initRects[j].pressed(mouse)) {
+        initRects[j].selected = !initRects[j].selected;
+        if (initRects[j].selected)
+          ready++;
+        else ready--;
+      }
   }
   // test: generate sequence
   //  int p = (int)random(2);
   //  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
 
   if (baseShape == 1) { // diamonds: rotate board 45 degrees
-		PVector offs = new PVector(displayWidth/2, displayHeight/2);
-		mouse.sub(offs);		
-		mouse.mult(1/boardScale);
-		mouse.rotate(PI/4.0);
-		mouse.add(offs);		
-	}
+    PVector offs = new PVector(displayWidth/2, displayHeight/2);
+    mouse.sub(offs);		
+    mouse.mult(1/boardScale);
+    mouse.rotate(PI/4.0);
+    mouse.add(offs);
+  }
 
-// test: generate sequence
-//  int p = (int)random(2);
-//  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
+  // test: generate sequence
+  //  int p = (int)random(2);
+  //  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
 
   if (gameState == 1) {
     for (i=0;i < totalGridSz;i++) 
@@ -271,14 +283,9 @@ void mousePressed() {
   }
 }
 
-void mouseReleased() {
-  PVector mouse = new PVector(mouseX, mouseY);
-  if (gameState == 0) {
-    for (int i=0; i<4;i++)
-      if (initRects[i].pressed(mouse))
-        initRects[i].selectTime = -1;
-  }
-}
+
+
+
 
 void process(Rect rect) {
   int pl = rect.player - 1;
@@ -344,11 +351,3 @@ void setGameState(int newState) {
   }
 }
 
-public boolean surfaceTouchEvent(MotionEvent event) {
-
-  //call to keep mouseX, mouseY, etc updated
-  super.surfaceTouchEvent(event);
-
-  //forward event to class for processing
-  return gesture.surfaceTouchEvent(event);
-}
