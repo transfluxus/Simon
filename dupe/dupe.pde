@@ -86,6 +86,7 @@ void assignColors() {
 }
 
 void resetColorSelection() {
+     ready = 0;
      for (int i=0; i<4; i++)
        initRects[i].selected = false;
 
@@ -248,7 +249,7 @@ void draw() {
     float fraction = (millis - limitTime - fadeTime)/(float)fadeTime;
     if (fraction > 1) fraction = 1;
     color winnerColor = players[winner].normal;
-    fill(red(winnerColor), green(winnerColor), blue(winnerColor), 255*fraction);
+    fill(red(winnerColor), green(winnerColor), blue(winnerColor), 255);
     rect(-100, -100, width + 200, height + 200);
     // SHOW NUMBER?
     int wi = win.width;
@@ -256,6 +257,9 @@ void draw() {
     float scale = (height/3.5f)/ win.height;
     imageMode(CENTER);
     image(win,width/2,height/2,wi*scale,hi*scale);
+    
+    fill(0,0,0, 255*(1-fraction));
+    rect(-100, -100, width + 200, height + 200);
   }
 }
 
