@@ -1,4 +1,5 @@
 
+/*
 import apwidgets.*;
 
 APMediaPlayer player;
@@ -42,4 +43,4 @@ public void onDestroy() {
   }
 }
 
-
+*/
