@@ -77,7 +77,6 @@ void validatePlayers() {
 }
 
 void initBoard() {
-  rects =new Rect[totalGridSz];
   calcGrid();
   ArrayList<Integer> g = new ArrayList<Integer>();
 
@@ -192,11 +191,20 @@ void draw() {
       for (i = sequenceAnimations.length-1; i >= 0; i--)
         sequenceAnimations[i].update();
     }
+  
+	pushMatrix();
+	if (baseShape == 1) { // diamonds: rotate board 45 degrees
+		translate(displayWidth/2, displayHeight/2);		
+		scale(boardScale);
+		rotate(-PI/4.0);
+		translate(-displayWidth/2, -displayHeight/2);		
+	}
 
     for (i=0;i < totalGridSz;i++) {
       rects[i].draw();
     }
-
+    
+	popMatrix();
     if (millis > limitTime)
       setGameState(2);
   }
@@ -238,6 +246,18 @@ void mousePressed() {
   // test: generate sequence
   //  int p = (int)random(2);
   //  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
+
+  if (baseShape == 1) { // diamonds: rotate board 45 degrees
+		PVector offs = new PVector(displayWidth/2, displayHeight/2);
+		mouse.sub(offs);		
+		mouse.mult(1/boardScale);
+		mouse.rotate(PI/4.0);
+		mouse.add(offs);		
+	}
+
+// test: generate sequence
+//  int p = (int)random(2);
+//  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
 
   if (gameState == 1) {
     for (i=0;i < totalGridSz;i++) 
