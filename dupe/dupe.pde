@@ -1,8 +1,8 @@
 import java.util.Collections;
-import ketai.ui.*;
+/* import ketai.ui.*;
 
 KetaiGesture gesture;
-
+*/
 Rect[] rects;
 Sequence[] sequences = new Sequence[4];
 SequenceAnimation[] sequenceAnimations = new SequenceAnimation[4];
@@ -25,7 +25,7 @@ void setup() {
   size(displayWidth, displayHeight);
   orientation(LANDSCAPE);
 
-gesture = new KetaiGesture(this);
+//gesture = new KetaiGesture(this);
 
   initPlayers();
   initBoard();
@@ -143,6 +143,7 @@ void restartGame() {
   limitTime = millis + gameplayLength;
   setGameState(0);
   resetPlayers();
+  validatePlayers();
   initBoard();
   initSequences();
 }
@@ -176,9 +177,8 @@ void draw() {
       if (players[i].ready)
         ready++;
     }
-    println("ready "+ready);
     if (ready==playerCount)
-      gameState=1;
+      setGameState(1);
   } 
   else if (gameState == 1 || gameState == 2) {
 
@@ -234,8 +234,8 @@ void mousePressed() {
     for (i=0; i<3;i++)
       if (button[i].pressed(mouse)) {
         playerCount=i+2;
-        gameState=0;
-        println(i);
+		restartGame();
+        setGameState(1);
       }
   }
   else if (gameState == 0) {
@@ -247,27 +247,30 @@ void mousePressed() {
   //  int p = (int)random(2);
   //  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
 
-  if (baseShape == 1) { // diamonds: rotate board 45 degrees
-		PVector offs = new PVector(displayWidth/2, displayHeight/2);
-		mouse.sub(offs);		
-		mouse.mult(1/boardScale);
-		mouse.rotate(PI/4.0);
-		mouse.add(offs);		
-	}
+  
 
 // test: generate sequence
 //  int p = (int)random(2);
 //  sequenceAnimations.add(new SequenceAnimation(new Sequence(5, playerKeyCount[p]), p+1));
 
   if (gameState == 1) {
+    pushMatrix();
+    if (baseShape == 1) { // diamonds: rotate board 45 degrees
+		PVector offs = new PVector(displayWidth/2, displayHeight/2);
+		mouse.sub(offs);		
+		mouse.mult(1/boardScale);
+		mouse.rotate(PI/4.0);
+		mouse.add(offs);		
+	}
     for (i=0;i < totalGridSz;i++) 
       if (rects[i].pressed(mouse)) {
         process(rects[i]);
         return;
       }
+    popMatrix();
   } 
   else if (gameState == 3 && millis > limitTime + 2 * fadeTime) {
-    restartGame();
+    setGameState(-1);
   }
 }
 
@@ -344,6 +347,7 @@ void setGameState(int newState) {
   }
 }
 
+/*
 public boolean surfaceTouchEvent(MotionEvent event) {
 
   //call to keep mouseX, mouseY, etc updated
@@ -352,3 +356,5 @@ public boolean surfaceTouchEvent(MotionEvent event) {
   //forward event to class for processing
   return gesture.surfaceTouchEvent(event);
 }
+*/
+

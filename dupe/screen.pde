@@ -9,11 +9,32 @@ float boardScale;
 int rectSz ;
 
 void calcGrid() {
-	calcStandardGrid();
+	// choose a random board depending on players
+    boolean success = false;
+	while (!success) {
+		switch ((int)random(8)) {
+			case 0: success = calcStandardGrid();
+				break;
+			case 1: success = calcHugeGrid();
+				break;
+			case 2: success = calcTinyGrid();
+				break;
+			case 3: success = calcDiamondGrid();
+				break;
+			case 4: success = calcLsGrid();
+				break;
+			case 5: success = calcDiamondFullGrid();
+				break;
+			case 6: success = calcDiamondHoleGrid();
+				break;
+			case 7: success = calcDiamondMirrorGrid();
+				break;
+		}
+	}
 }
 
 // square grid: 2,3,4 players
-void calcStandardGrid() {
+boolean calcStandardGrid() {
   gridW = 4; 
   gridH = 3;
   totalGridSz = gridW*gridH;
@@ -28,10 +49,14 @@ void calcStandardGrid() {
       gridPoints[x+y*gridW] = new PVector(xoff + x*rectSz,y*rectSz);
     }
   }
+
+  return true;
 }
 
 // huge (square) grid: 4 players
-void calcHugeGrid() {
+boolean calcHugeGrid() {
+  if (playerCount != 4)
+	return false;
   gridW = 5; 
   gridH = 4;
   totalGridSz = gridW*gridH;
@@ -46,10 +71,13 @@ void calcHugeGrid() {
       gridPoints[x+y*gridW] = new PVector(xoff + x*rectSz,y*rectSz);
     }
   }
+  return true;
 }
 
 // tiny (square) grid: 2,3 players
-void calcTinyGrid() {
+boolean calcTinyGrid() {
+  if (playerCount == 4)
+	return false;
   gridW = 3;
   gridH = 2;
   totalGridSz = gridW*gridH;
@@ -64,11 +92,12 @@ void calcTinyGrid() {
       gridPoints[x+y*gridW] = new PVector(xoff + x*rectSz,y*rectSz);
     }
   }
+  return true;
 }
 
 
 // diamond grid: 2,3,4 players
-void calcDiamondGrid() {
+boolean calcDiamondGrid() {
   int [] [] cells = new int[] [] {
       { 0, 1, 0, 0, 0 },
       { 1, 1, 1, 1, 0 },
@@ -95,11 +124,17 @@ void calcDiamondGrid() {
 	  }
     }
   } 
+  return true;
 }
 
 
 // Four L-shapes and a central 6-block: 2,3 players
-void calcLsGrid() {
+boolean calcLsGrid() {
+    // disabled: return false
+    if (true) return false;
+
+  if (playerCount == 4)
+	return false;
 	int [] [] cells = new int[] [] {
       { 1, 1, 0, 0, 0, 1, 1 },
       { 1, 0, 0, 0, 0, 0, 1 },
@@ -135,10 +170,13 @@ void calcLsGrid() {
 		i++;
 	  }
     }
+  return true;
 }
 
 // diamond grid "full": 2,4 players
-void calcDiamondFullGrid() {
+boolean calcDiamondFullGrid() {
+  if (playerCount == 3)
+	return false;
   int [] [] cells = new int[] [] {
       { 0, 1, 1, 0, 0 },
       { 1, 1, 1, 1, 0 },
@@ -165,10 +203,11 @@ void calcDiamondFullGrid() {
 	  }
     }
   } 
+  return true;
 }
 
 // diamond grid "hole": 2, 3, 4 players
-void calcDiamondHoleGrid() {
+boolean calcDiamondHoleGrid() {
   int [] [] cells = new int[] [] {
       { 0, 1, 1, 0, 0 },
       { 1, 1, 0, 1, 0 },
@@ -195,10 +234,13 @@ void calcDiamondHoleGrid() {
 	  }
     }
   } 
+  return true;
 }
 
 // diamond grid "mirror": 2 players
-void calcDiamondMirrorGrid() {
+boolean calcDiamondMirrorGrid() {
+  if (playerCount != 2)
+	return false;
   int [] [] cells = new int[] [] {
       { 0, 1, 1, 0, 0 },
       { 1, 1, 1, 0, 0 },
@@ -225,4 +267,6 @@ void calcDiamondMirrorGrid() {
 	  }
     }
   } 
+  return true;
 }
+
