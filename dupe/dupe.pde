@@ -84,6 +84,12 @@ void assignColors() {
      players[i].active = initRects[i].selected;
 }
 
+void resetColorSelection() {
+     for (int i=0; i<4; i++)
+       initRects[i].selected = false;
+
+}
+
 void initBoard() {
   calcGrid();
   ArrayList<Integer> g = new ArrayList<Integer>();
@@ -351,6 +357,10 @@ void setGameState(int newState) {
 
   if (newState == 2) {
     computeWinner();
+  }
+  
+  if (newState == -1) {
+    resetColorSelection();
   }
 }
 
