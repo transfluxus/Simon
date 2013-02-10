@@ -1,8 +1,9 @@
 import java.util.Collections;
 
-//import ketai.ui.*;
-
-// KetaiGesture gesture;
+/*
+import ketai.ui.*;
+KetaiGesture gesture;
+*/
 
 Rect[] rects;
 Sequence[] sequences = new Sequence[4];
@@ -264,8 +265,12 @@ void draw() {
 }
 
 void mousePressed() {
+  managePressed(mouseX, mouseY);
+}
+
+void managePressed(int mX, int mY) {
   int i;
-  PVector mouse = new PVector(mouseX, mouseY);
+  PVector mouse = new PVector(mX, mY);
   if (gameState == -1) {
     for (i=0; i<3;i++)
       if (button[i].pressed(mouse)) {
