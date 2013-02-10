@@ -22,9 +22,10 @@ int playerCount = 4;
 int gameState = -1;
 // states: -1 - intro screen, 0 - color select/check ready, 1 - game, 2 - end
 int ready=0;
-PImage titleImage, tapColor;
+PImage titleImage, tapColor, win;
 
 void setup() {
+//  size(600,400);
   size(displayWidth, displayHeight);
   orientation(LANDSCAPE);
 
@@ -142,6 +143,7 @@ void initMenu() {
   titleImage = loadImage("dupeTitle.png");
   tapColor = loadImage("tap_your_colour.png");
   rectSz = (height-60)/2;
+  win = loadImage("win.png");
   for (int i=0; i < 4;i++) 
     initRects[i] = new Rect(new PVector(), i+1, 1.0, 0);
 
@@ -183,7 +185,9 @@ void draw() {
     int wi = titleImage.width;
     int hi= titleImage.height;
     float scale = (height/3f) / titleImage.height ;
+
     image(titleImage, width/2, height/2 - titleImage.height*scale / 4, scale*wi, scale*hi);
+
     for (int i=0; i < 3;i++)
       button[i].draw();
   }
@@ -240,13 +244,18 @@ void draw() {
       setGameState(3);
   }
 
-  if (gameState == 3) {
+   if (gameState == 3) {
     float fraction = (millis - limitTime - fadeTime)/(float)fadeTime;
     if (fraction > 1) fraction = 1;
     color winnerColor = players[winner].normal;
     fill(red(winnerColor), green(winnerColor), blue(winnerColor), 255*fraction);
     rect(-100, -100, width + 200, height + 200);
     // SHOW NUMBER?
+    int wi = win.width;
+    int hi= win.height;
+    float scale = (height/3.5f)/ win.height;
+    imageMode(CENTER);
+    image(win,width/2,height/2,wi*scale,hi*scale);
   }
 }
 
@@ -271,7 +280,7 @@ void mousePressed() {
   }
 
   if (gameState == 1) {
-    pushMatrix();
+
     if (baseShape == 1) { // diamonds: rotate board 45 degrees
 		PVector offs = new PVector(width/2, height/2);
 		mouse.sub(offs);		
@@ -284,7 +293,6 @@ void mousePressed() {
         process(rects[i]);
         return;
       }
-    popMatrix();
   } 
   else if (gameState == 3 && millis > limitTime + 2 * fadeTime) {
     setGameState(-1);
