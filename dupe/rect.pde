@@ -15,7 +15,6 @@ class Rect {
   int id;
 
   Rect(PVector pos, int player, float size, int id) {
-
     this.pos = pos;
     this.player= player;
     this.size = size;
