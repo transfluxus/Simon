@@ -79,6 +79,11 @@ void validatePlayers() {
   }
 }
 
+void assignColors() {
+   for (int i=0; i<4; i++)
+     players[i].active = initRects[i].selected;
+}
+
 void initBoard() {
   calcGrid();
   ArrayList<Integer> g = new ArrayList<Integer>();
@@ -185,8 +190,10 @@ void draw() {
     for (int i=0; i < 4;i++) 
       initRects[i].draw();
     //        println("ready "+ready + " / wait for "+playerCount);
-    if (ready==playerCount)
+    if (ready==playerCount) {
+      assignColors();
       restartGame();
+    }
   } 
   else if (gameState == 1 || gameState == 2) {
 
