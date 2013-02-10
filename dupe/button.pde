@@ -10,8 +10,8 @@ class Button {
   Button(PVector pos, int number, float size, String img) {
     this.pos = pos;
     this.number= number;
-    this.size = size;
     this.img = loadImage(img);
+    this.size = (height/8f) / this.img.height;
   }
 
   float x() {

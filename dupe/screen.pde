@@ -42,8 +42,8 @@ boolean calcStandardGrid() {
   baseShape = 0;
   boardScale = 1.0;
   rects = new Rect[totalGridSz];
-  rectSz = displayHeight / gridH;
-  int xoff = (int)(displayWidth * 0.5 - gridW * rectSz * 0.5);
+  rectSz = height / gridH;
+  int xoff = (int)(width * 0.5 - gridW * rectSz * 0.5);
   for(int x= 0; x < gridW; x++) {
     for(int y=0; y <gridH; y++) {
       gridPoints[x+y*gridW] = new PVector(xoff + x*rectSz,y*rectSz);
@@ -64,8 +64,8 @@ boolean calcHugeGrid() {
   baseShape = 0;
   boardScale = 1.0;
   rects = new Rect[totalGridSz];
-  rectSz = displayHeight / gridH;
-  int xoff = (int)(displayWidth * 0.5 - gridW * rectSz * 0.5);
+  rectSz = height / gridH;
+  int xoff = (int)(width * 0.5 - gridW * rectSz * 0.5);
   for(int x= 0; x < gridW; x++) {
     for(int y=0; y <gridH; y++) {
       gridPoints[x+y*gridW] = new PVector(xoff + x*rectSz,y*rectSz);
@@ -85,8 +85,8 @@ boolean calcTinyGrid() {
   baseShape = 0;
   boardScale = 1.0;
   rects = new Rect[totalGridSz];
-  rectSz = displayHeight / gridH;
-  int xoff = (int)(displayWidth * 0.5 - gridW * rectSz * 0.5);
+  rectSz = height / gridH;
+  int xoff = (int)(width * 0.5 - gridW * rectSz * 0.5);
   for(int x= 0; x < gridW; x++) {
     for(int y=0; y <gridH; y++) {
       gridPoints[x+y*gridW] = new PVector(xoff + x*rectSz,y*rectSz);
@@ -113,8 +113,8 @@ boolean calcDiamondGrid() {
   boardScale = 5.0/(3.0*sqrt(2.0));
   rects = new Rect[totalGridSz];
   gridPoints = new PVector[gridW*gridH];
-  rectSz = displayHeight / gridH;
-  int xoff = (int)(displayWidth * 0.5 - gridW * rectSz * 0.5);
+  rectSz = height / gridH;
+  int xoff = (int)(width * 0.5 - gridW * rectSz * 0.5);
   int i = 0;
   for(int x= 0; x < gridW; x++) {
     for(int y=0; y < gridH; y++) {
@@ -150,8 +150,8 @@ boolean calcLsGrid() {
   boardScale = 1.0;
   rects = new Rect[totalGridSz];
   gridPoints = new PVector[gridW*gridH];
-  rectSz = displayHeight / gridH;
-  int xoff = (int)(displayWidth * 0.5 - gridW * rectSz * 0.5);
+  rectSz = height / gridH;
+  int xoff = (int)(width * 0.5 - gridW * rectSz * 0.5);
   int i = 0;
   for(int x= 0; x < gridW; x++) {
     for(int y=0; y < gridH; y++) {
@@ -162,8 +162,8 @@ boolean calcLsGrid() {
     }
   }
 
-  int yoff = (int)displayHeight/2 - rectSz;
-  xoff = (int)displayWidth/2 - rectSz * 3/2;
+  int yoff = (int)height/2 - rectSz;
+  xoff = (int)width/2 - rectSz * 3/2;
   for(int x= 0; x < 3; x++) {
     for(int y=0; y < 2; y++) {
       	gridPoints[i] = new PVector(xoff + x*rectSz,yoff + y*rectSz);
@@ -192,8 +192,8 @@ boolean calcDiamondFullGrid() {
   boardScale = 5.0/(3.0*sqrt(2.0));
   rects = new Rect[totalGridSz];
   gridPoints = new PVector[gridW*gridH];
-  rectSz = displayHeight / gridH;
-  int xoff = (int)(displayWidth * 0.5 - gridW * rectSz * 0.5);
+  rectSz = height / gridH;
+  int xoff = (int)(width * 0.5 - gridW * rectSz * 0.5);
   int i = 0;
   for(int x= 0; x < gridW; x++) {
     for(int y=0; y < gridH; y++) {
@@ -223,8 +223,8 @@ boolean calcDiamondHoleGrid() {
   boardScale = 5.0/(3.0*sqrt(2.0));
   rects = new Rect[totalGridSz];
   gridPoints = new PVector[gridW*gridH];
-  rectSz = displayHeight / gridH;
-  int xoff = (int)(displayWidth * 0.5 - gridW * rectSz * 0.5);
+  rectSz = height / gridH;
+  int xoff = (int)(width * 0.5 - gridW * rectSz * 0.5);
   int i = 0;
   for(int x= 0; x < gridW; x++) {
     for(int y=0; y < gridH; y++) {
@@ -256,8 +256,8 @@ boolean calcDiamondMirrorGrid() {
   boardScale = 5.0/(3.0*sqrt(2.0));
   rects = new Rect[totalGridSz];
   gridPoints = new PVector[gridW*gridH];
-  rectSz = displayHeight / gridH;
-  int xoff = (int)(displayWidth * 0.5 - gridW * rectSz * 0.5);
+  rectSz = height / gridH;
+  int xoff = (int)(width * 0.5 - gridW * rectSz * 0.5);
   int i = 0;
   for(int x= 0; x < gridW; x++) {
     for(int y=0; y < gridH; y++) {

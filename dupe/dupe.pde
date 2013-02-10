@@ -129,23 +129,24 @@ Rect[] initRects = new Rect[4];
 Button[] button = new Button[3];
 
 void initMenu() {
-  button[0] = new Button(new PVector(width/3, height- height/3f), 2, 1f, "2p.png");  
-  button[1] = new Button(new PVector(width/2, height- height/3f), 3, 1f, "3p.png");
-  button[2] = new Button(new PVector(width - width/3, height- height/3f), 4, 1f, "4p.png");
+  button[0] = new Button(new PVector(width/4, height- height/4f), 2, 1f, "2p.png");  
+  button[1] = new Button(new PVector(width/2, height- height/4f), 3, 1f, "3p.png");
+  button[2] = new Button(new PVector(width - width/4, height- height/4f), 4, 1f, "4p.png");
 
   titleImage = loadImage("dupeTitle.png");
-  tapColor = loadImage("tap_your_colour.png"); 
+  tapColor = loadImage("tap_your_colour.png");
+  rectSz = (height-60)/2;
   for (int i=0; i < 4;i++) 
-    initRects[i] = new Rect(new PVector(), i+1, defaultSize*1.4, 0);
+    initRects[i] = new Rect(new PVector(), i+1, 1.0, 0);
 
-  int t = 10;
-  float xOff = width/3f;
-  initRects[0].pos.set(xOff, t, 0);
-  float xOff2 = xOff + initRects[3].width() + t*2;
-
-  initRects[1].pos.set(xOff2, t, 0);
-  initRects[2].pos.set(xOff, height-t-initRects[2].height(), 0);
-  initRects[3].pos.set(xOff2, height-t- initRects[3].height(), 0);
+  int xOff = 2*width/3 - rectSz - 10;
+  int yOff = 20;
+  int xOff2 = xOff + 20 + rectSz;
+  int yOff2 = yOff + 20 + rectSz;
+  initRects[0].pos.set(xOff, yOff, 0);
+  initRects[1].pos.set(xOff2, yOff, 0);
+  initRects[2].pos.set(xOff, yOff2, 0);
+  initRects[3].pos.set(xOff2, yOff2, 0);
 }
 
 void restartGame() {
@@ -175,8 +176,8 @@ void draw() {
     imageMode(CENTER);
     int wi = titleImage.width;
     int hi= titleImage.height;
-    float scale = titleImage.height / (height/3f);
-    image(titleImage, width/2, height/10+titleImage.height/2, scale*wi, scale*hi);
+    float scale = (height/3f) / titleImage.height ;
+    image(titleImage, width/2, height/2 - titleImage.height*scale / 4, scale*wi, scale*hi);
     for (int i=0; i < 3;i++)
       button[i].draw();
   }
@@ -185,8 +186,9 @@ void draw() {
     imageMode(CORNER);
     int wi = tapColor.width;
     int hi= tapColor.height;
-    float scale = titleImage.height / (height/2f);
-    image(tapColor, 10, height/2, scale*wi, scale*hi);
+    float scale = min( (height/2f) / tapColor.height, (width/3f) / (tapColor.width+ 50) );
+    image(tapColor, 30, height/2, scale*wi, scale*hi);
+    rectSz = (height-60)/2;
     for (int i=0; i < 4;i++) 
       initRects[i].draw();
     //        println("ready "+ready + " / wait for "+playerCount);
@@ -209,10 +211,10 @@ void draw() {
 
     pushMatrix();
     if (baseShape == 1) { // diamonds: rotate board 45 degrees
-      translate(displayWidth/2, displayHeight/2);		
+      translate(width/2, height/2);		
       scale(boardScale);
       rotate(-PI/4.0);
-      translate(-displayWidth/2, -displayHeight/2);
+      translate(-width/2, -height/2);
     }
 
     for (i=0;i < totalGridSz;i++) {
@@ -227,7 +229,7 @@ void draw() {
     // for some time, fade to black
     float fraction = (millis - limitTime)/(float)fadeTime;
     fill(0, 0, 0, 255.0*fraction);
-    rect(-100, -100, displayWidth + 200, displayHeight + 200);
+    rect(-100, -100, width + 200, height + 200);
     if (millis > limitTime + fadeTime)
       setGameState(3);
   }
@@ -237,7 +239,7 @@ void draw() {
     if (fraction > 1) fraction = 1;
     color winnerColor = players[winner].normal;
     fill(red(winnerColor), green(winnerColor), blue(winnerColor), 255*fraction);
-    rect(-100, -100, displayWidth + 200, displayHeight + 200);
+    rect(-100, -100, width + 200, height + 200);
     // SHOW NUMBER?
   }
 }
@@ -265,7 +267,7 @@ void mousePressed() {
   if (gameState == 1) {
     pushMatrix();
     if (baseShape == 1) { // diamonds: rotate board 45 degrees
-		PVector offs = new PVector(displayWidth/2, displayHeight/2);
+		PVector offs = new PVector(width/2, height/2);
 		mouse.sub(offs);		
 		mouse.mult(1/boardScale);
 		mouse.rotate(PI/4.0);
