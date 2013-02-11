@@ -29,10 +29,11 @@ int gameState = -1;
 // states: -1 - intro screen, 0 - color select/check ready, 1 - game, 2 - end
 int ready=0;
 PImage titleImage, tapColor, win, instructions, creditsTitle, creditsNames;
+Animation howtoAnim;
 
 void setup() {
-  size(600,400);
-  //size(displayWidth, displayHeight);
+  //size(600,400);
+  size(displayWidth, displayHeight);
   orientation(LANDSCAPE);
 
   // gesture = new KetaiGesture(this);
@@ -169,6 +170,14 @@ void initMenu() {
   initRects[1].pos.set(xOff2, yOff, 0);
   initRects[2].pos.set(xOff, yOff2, 0);
   initRects[3].pos.set(xOff2, yOff2, 0);
+
+  // animation
+  howtoAnim = new Animation(width/2, height * 0.6, height / 1600f, 500);
+  for (int k=0; k<8; k++) {
+	String pre_zero = "0";
+	if (k>9) pre_zero = "";
+	howtoAnim.addFrame("animation/frame"+pre_zero+k+".png");
+  }
 }
 
 void restartGame() {
@@ -303,8 +312,8 @@ void showMenuScreen() {
 		case 2 : {  // instructions
 			imageMode(CENTER);
 			float scale = height / 850f;
-
 			image(instructions, width/2, height/2 - instructions.height*scale, scale*instructions.width, scale*instructions.height);
+			howtoAnim.draw();
 			button[5].draw();
 		break;
 		}
@@ -335,6 +344,7 @@ void managePressed(int mX, int mY) {
 		  }
 		if (button[3].pressed(mouse)) {
 			menuScreen = 2;
+			howtoAnim.restart();
 		}
 		if (button[4].pressed(mouse)) {
 			menuScreen = 3;
