@@ -11,15 +11,15 @@ class Button {
     this.pos = pos;
     this.number= number;
     this.img = loadImage(img);
-     this.size = (height/8f) / this.img.height;
+     this.size = (height/8f) / this.img.height * size;
   }
 
   float x() {
-    return pos.x + img.width*0.5*(1-size);
+    return pos.x; // + img.width*0.5*size;
   }
 
   float y() {
-    return pos.y + img.height*0.5*(1-size);
+    return pos.y; // + img.height*0.5*size;
   }
   float width() {
     return img.width * size;

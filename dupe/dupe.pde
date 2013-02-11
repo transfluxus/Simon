@@ -22,14 +22,17 @@ int gameplayLength = 45000; //45000;
 int winner = 0;
 int playerCount = 4;
 
+int menuScreen = 0;
+// menuScreen: 0 - select player, 1 - select color, 2 - instructions, 3 - credits
+
 int gameState = -1;
 // states: -1 - intro screen, 0 - color select/check ready, 1 - game, 2 - end
 int ready=0;
-PImage titleImage, tapColor, win;
+PImage titleImage, tapColor, win, instructions, creditsTitle, creditsNames;
 
 void setup() {
-//  size(600,400);
-  size(displayWidth, displayHeight);
+  size(600,400);
+  //size(displayWidth, displayHeight);
   orientation(LANDSCAPE);
 
   // gesture = new KetaiGesture(this);
@@ -137,17 +140,24 @@ void initSequences() {
 }
 
 Rect[] initRects = new Rect[4];
-Button[] button = new Button[3];
+Button[] button = new Button[6];
 
 void initMenu() {
-  button[0] = new Button(new PVector(width/4, height- height/4f), 2, 1f, "2p.png");  
-  button[1] = new Button(new PVector(width/2, height- height/4f), 3, 1f, "3p.png");
-  button[2] = new Button(new PVector(width - width/4, height- height/4f), 4, 1f, "4p.png");
+  button[0] = new Button(new PVector(width/2 - min(width/4,height/4) , height * 0.6f), 2, 0.5f, "2p.png");  
+  button[1] = new Button(new PVector(width/2, height * 0.6f), 3, 0.5f, "3p.png");
+  button[2] = new Button(new PVector(width/2 + min(width/4, height/4), height * 0.6f), 4, 0.5f, "4p.png");
+  button[3] = new Button(new PVector(width*13/16f, height * 15/16f), 5, 0.3f, "howto.png");
+  button[4] = new Button(new PVector(width*2/16f, height * 15/16f), 6, 0.3f, "credits.png");
+  button[5] = new Button(new PVector(width/2, height * 14/16f), 7, 1f, "back.png");
 
   titleImage = loadImage("dupeTitle.png");
   tapColor = loadImage("tap_your_colour.png");
-  rectSz = (height-60)/2;
   win = loadImage("win.png");
+  instructions = loadImage("instruction_words.png");
+  creditsTitle = loadImage("credits_title.png");
+  creditsNames = loadImage("credits_names.png");
+
+  rectSz = (height-60)/2;
   for (int i=0; i < 4;i++) 
     initRects[i] = new Rect(new PVector(), i+1, 1.0, 0);
 
@@ -187,15 +197,7 @@ void draw() {
    */
   if (gameState == -1) {
     background(0);
-    imageMode(CENTER);
-    int wi = titleImage.width;
-    int hi= titleImage.height;
-    float scale = (height/3f) / titleImage.height ;
-
-    image(titleImage, width/2, height/2 - titleImage.height*scale / 4, scale*wi, scale*hi);
-
-    for (int i=0; i < 3;i++)
-      button[i].draw();
+    showMenuScreen();
   }
   else if (gameState== 0) {
     background(0);
@@ -284,6 +286,39 @@ void draw() {
   }
 }
 
+void showMenuScreen() {
+	switch (menuScreen) {
+		case 0 : { // main menu
+			imageMode(CENTER);
+			int wi = titleImage.width;
+			int hi= titleImage.height;
+			float scale = (height/3f) / titleImage.height ;
+
+			image(titleImage, width/2, height/2 - titleImage.height*scale * 5 / 8, scale*wi, scale*hi);
+
+			for (int i=0; i < 5;i++)
+			  button[i].draw();
+		break;
+		}
+		case 2 : {  // instructions
+			imageMode(CENTER);
+			float scale = height / 850f;
+
+			image(instructions, width/2, height/2 - instructions.height*scale, scale*instructions.width, scale*instructions.height);
+			button[5].draw();
+		break;
+		}
+		case 3: { // credits
+			imageMode(CENTER);
+			float scale = height / 850f;
+			image(creditsTitle, width/2, height*1/8, creditsTitle.width * scale, creditsTitle.height * scale);
+			image(creditsNames, width/2, height/2, scale*creditsNames.width, scale*creditsNames.height);
+			button[5].draw();
+		break;
+		}
+	}
+}
+
 void mousePressed() {
   managePressed(mouseX, mouseY);
 }
@@ -292,11 +327,23 @@ void managePressed(int mX, int mY) {
   int i;
   PVector mouse = new PVector(mX, mY);
   if (gameState == -1) {
-    for (i=0; i<3;i++)
-      if (button[i].pressed(mouse)) {
-        playerCount=i+2;
-        gameState=0;
-      }
+	if (menuScreen == 0) {
+		for (i=0; i<3;i++)
+		  if (button[i].pressed(mouse)) {
+		    playerCount=i+2;
+		    gameState=0;
+		  }
+		if (button[3].pressed(mouse)) {
+			menuScreen = 2;
+		}
+		if (button[4].pressed(mouse)) {
+			menuScreen = 3;
+		}
+	} else if (menuScreen == 2 || menuScreen == 3) {
+		if (button[5].pressed(mouse)) {
+			menuScreen = 0;
+		}
+	}
   }
   else if (gameState == 0) {
     for (int j=0; j<4;j++)
