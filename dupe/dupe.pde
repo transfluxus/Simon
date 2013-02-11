@@ -15,7 +15,9 @@ Player [] players = new Player[4];
 
 int limitTime = 0;
 int fadeTime = 1000;
-int waitTime = 3000;
+int waitTime = 2000;
+int startTime = 0;
+boolean started = false;
 int gameplayLength = 45000; //45000;
 int winner = 0;
 int playerCount = 4;
@@ -161,12 +163,14 @@ void initMenu() {
 
 void restartGame() {
   // 45 seconds
-  limitTime = millis + gameplayLength;
+  limitTime = millis + gameplayLength + waitTime;
+  startTime = millis + waitTime;
   setGameState(1);
   resetPlayers();
   validatePlayers();
   initBoard();
   initSequences();
+  started = false;
 }
 
 void resetPlayers()
@@ -216,9 +220,14 @@ void draw() {
     int i;
 
     if (gameState == 1) {
-      // backwards update because we might delete in-place
-      for (i = sequenceAnimations.length-1; i >= 0; i--)
-        sequenceAnimations[i].update();
+	  if (started) {
+		  for (i = 0; i < sequenceAnimations.length; i++)
+		    sequenceAnimations[i].update();
+		} else if (millis >= startTime) {
+			allRectsBlink();
+			initSequences();
+			started = true;		
+		}
     }
 
     pushMatrix();
@@ -234,6 +243,17 @@ void draw() {
     }
 
     popMatrix();
+
+	// overlay at start
+	if (!started) {
+		float fraction = min(1.0, (startTime - waitTime/2 - millis) / float(waitTime/2));
+		if (fraction > 0) {
+			fill(0,0,0, 255*fraction);
+		    rect(-100, -100, width + 200, height + 200);
+		}
+	}
+
+
     if (millis > limitTime)
       setGameState(2);
   }
@@ -357,6 +377,11 @@ void allRectsFail( int player ) {
   for (int i=0; i<rects.length; i++)
     if (rects[i].player == player)
       rects[i].showFail();
+}
+
+void allRectsBlink() {
+	for (int i=0; i<rects.length; i++)
+      rects[i].showSuccess();
 }
 
 void computeWinner() {
