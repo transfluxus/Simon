@@ -165,12 +165,20 @@ void initMenu() {
   initRects[2].pos.set(xOff, yOff2, 0);
   initRects[3].pos.set(xOff2, yOff2, 0);
 
+  loadAnimation();
+}
+
+void loadAnimation() {
+  int[] frameIndexes = {0,1,2,3,0,4,5,6,0,3,0,3,0,3,0, 7,8,9,0,10,11,12};
+  int[] delayMultipl = {8,4,4,4,4,4,4,4,1,1,1,1,1,1,12,4,4,4,4,4, 4, 8 };
+
   // animation
   howtoAnim = new Animation(width/2, height * 0.6, height / 1600f, 500);
-  for (int k=0; k<8; k++) {
+  for (int k=0; k < frameIndexes.length; k++) {
+	int fi = frameIndexes[k];
     String pre_zero = "0";
-    if (k>9) pre_zero = "";
-    howtoAnim.addFrame("animation/frame"+pre_zero+k+".png");
+    if (fi>9) pre_zero = "";
+    howtoAnim.addFrame("animation/frame"+pre_zero+fi+".png", 125 * delayMultipl[k]);
   }
 }
 
