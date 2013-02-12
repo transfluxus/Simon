@@ -1,5 +1,6 @@
 import java.util.Collections;
 
+
 Rect[] rects;
 Sequence[] sequences = new Sequence[4];
 SequenceAnimation[] sequenceAnimations = new SequenceAnimation[4];
@@ -137,7 +138,7 @@ Rect[] initRects = new Rect[4];
 Button[] button = new Button[6];
 
 void initMenu() {
-  button[0] = new Button(new PVector(width/2 - min(width/4, height/4), height * 0.6f), 2, 0.5f, "2p.png");  
+  button[0] = new Button(new PVector(width/2 - min(width/4,height/4) , height * 0.6f), 2, 0.5f, "2p.png");  
   button[1] = new Button(new PVector(width/2, height * 0.6f), 3, 0.5f, "3p.png");
   button[2] = new Button(new PVector(width/2 + min(width/4, height/4), height * 0.6f), 4, 0.5f, "4p.png");
   button[3] = new Button(new PVector(width*13/16f, height * 15/16f), 5, 0.3f, "howto.png");

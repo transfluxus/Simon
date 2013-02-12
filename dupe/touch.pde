@@ -1,5 +1,3 @@
-
-
 public boolean surfaceTouchEvent(android.view.MotionEvent me) {
 
   int action = (me.getAction() & me.ACTION_MASK);
