@@ -1,9 +1,5 @@
 import java.util.Collections;
 
-//import ketai.ui.*;
-
-// KetaiGesture gesture;
-
 Rect[] rects;
 Sequence[] sequences = new Sequence[4];
 SequenceAnimation[] sequenceAnimations = new SequenceAnimation[4];
@@ -14,26 +10,31 @@ Player [] players = new Player[4];
 
 int limitTime = 0;
 int fadeTime = 1000;
-int waitTime = 3000;
+int waitTime = 2000;
+int startTime = 0;
+boolean started = false;
 int gameplayLength = 45000; //45000;
 int winner = 0;
 int playerCount = 4;
 
+int menuScreen = 0;
+// menuScreen: 0 - select player, 1 - select color, 2 - instructions, 3 - credits
+
 int gameState = -1;
 // states: -1 - intro screen, 0 - color select/check ready, 1 - game, 2 - end
 int ready=0;
-PImage titleImage, tapColor, win;
+PImage titleImage, tapColor, win, instructions, creditsTitle, creditsNames;
+Animation howtoAnim;
 
 void setup() {
-//  size(600,400);
+  //size(600,400);
   size(displayWidth, displayHeight);
   orientation(LANDSCAPE);
-
-  // gesture = new KetaiGesture(this);
 
   initPlayers();
   initBoard();
   initMenu();
+  initSounds();  
   //  restartGame();
   strokeWeight(8);
 }
@@ -81,15 +82,14 @@ void validatePlayers() {
 }
 
 void assignColors() {
-   for (int i=0; i<4; i++)
-     players[i].active = initRects[i].selected;
+  for (int i=0; i<4; i++)
+    players[i].active = initRects[i].selected;
 }
 
 void resetColorSelection() {
-     ready = 0;
-     for (int i=0; i<4; i++)
-       initRects[i].selected = false;
-
+  ready = 0;
+  for (int i=0; i<4; i++)
+    initRects[i].selected = false;
 }
 
 void initBoard() {
@@ -134,17 +134,24 @@ void initSequences() {
 }
 
 Rect[] initRects = new Rect[4];
-Button[] button = new Button[3];
+Button[] button = new Button[6];
 
 void initMenu() {
-  button[0] = new Button(new PVector(width/4, height- height/4f), 2, 1f, "2p.png");  
-  button[1] = new Button(new PVector(width/2, height- height/4f), 3, 1f, "3p.png");
-  button[2] = new Button(new PVector(width - width/4, height- height/4f), 4, 1f, "4p.png");
+  button[0] = new Button(new PVector(width/2 - min(width/4, height/4), height * 0.6f), 2, 0.5f, "2p.png");  
+  button[1] = new Button(new PVector(width/2, height * 0.6f), 3, 0.5f, "3p.png");
+  button[2] = new Button(new PVector(width/2 + min(width/4, height/4), height * 0.6f), 4, 0.5f, "4p.png");
+  button[3] = new Button(new PVector(width*13/16f, height * 15/16f), 5, 0.3f, "howto.png");
+  button[4] = new Button(new PVector(width*2/16f, height * 15/16f), 6, 0.3f, "credits.png");
+  button[5] = new Button(new PVector(width/2, height * 14/16f), 7, 1f, "back.png");
 
   titleImage = loadImage("dupeTitle.png");
   tapColor = loadImage("tap_your_colour.png");
-  rectSz = (height-60)/2;
   win = loadImage("win.png");
+  instructions = loadImage("instruction_words.png");
+  creditsTitle = loadImage("credits_title.png");
+  creditsNames = loadImage("credits_names.png");
+
+  rectSz = (height-60)/2;
   for (int i=0; i < 4;i++) 
     initRects[i] = new Rect(new PVector(), i+1, 1.0, 0);
 
@@ -156,16 +163,27 @@ void initMenu() {
   initRects[1].pos.set(xOff2, yOff, 0);
   initRects[2].pos.set(xOff, yOff2, 0);
   initRects[3].pos.set(xOff2, yOff2, 0);
+
+  // animation
+  howtoAnim = new Animation(width/2, height * 0.6, height / 1600f, 500);
+  for (int k=0; k<8; k++) {
+    String pre_zero = "0";
+    if (k>9) pre_zero = "";
+    howtoAnim.addFrame("animation/frame"+pre_zero+k+".png");
+  }
 }
 
 void restartGame() {
   // 45 seconds
-  limitTime = millis + gameplayLength;
+  limitTime = millis + gameplayLength + waitTime;
+  startTime = millis + waitTime;
   setGameState(1);
   resetPlayers();
   validatePlayers();
   initBoard();
   initSequences();
+  started = false;
+  playMain();
 }
 
 void resetPlayers()
@@ -182,15 +200,7 @@ void draw() {
    */
   if (gameState == -1) {
     background(0);
-    imageMode(CENTER);
-    int wi = titleImage.width;
-    int hi= titleImage.height;
-    float scale = (height/3f) / titleImage.height ;
-
-    image(titleImage, width/2, height/2 - titleImage.height*scale / 4, scale*wi, scale*hi);
-
-    for (int i=0; i < 3;i++)
-      button[i].draw();
+    showMenuScreen();
   }
   else if (gameState== 0) {
     background(0);
@@ -215,9 +225,15 @@ void draw() {
     int i;
 
     if (gameState == 1) {
-      // backwards update because we might delete in-place
-      for (i = sequenceAnimations.length-1; i >= 0; i--)
-        sequenceAnimations[i].update();
+      if (started) {
+        for (i = 0; i < sequenceAnimations.length; i++)
+          sequenceAnimations[i].update();
+      } 
+      else if (millis >= startTime) {
+        allRectsBlink();
+        initSequences();
+        started = true;
+      }
     }
 
     pushMatrix();
@@ -233,6 +249,18 @@ void draw() {
     }
 
     popMatrix();
+
+    // overlay at start
+    if (!started) {
+      float fraction = min(1.0, (startTime - waitTime/2 - millis) / float(waitTime/2));
+      if (fraction > 0) {
+        fill(0, 0, 0, 255*fraction);
+        rect(-100, -100, width + 200, height + 200);
+      }
+    }
+
+    updateSounds();
+
     if (millis > limitTime)
       setGameState(2);
   }
@@ -245,7 +273,7 @@ void draw() {
       setGameState(3);
   }
 
-   if (gameState == 3) {
+  if (gameState == 3) {
     float fraction = (millis - limitTime - fadeTime)/(float)fadeTime;
     if (fraction > 1) fraction = 1;
     color winnerColor = players[winner].normal;
@@ -256,27 +284,85 @@ void draw() {
     int hi= win.height;
     float scale = (height/3.5f)/ win.height;
     imageMode(CENTER);
-    image(win,width/2,height/2,wi*scale,hi*scale);
-    
-    fill(0,0,0, 255*(1-fraction));
+    image(win, width/2, height/2, wi*scale, hi*scale);
+
+    fill(0, 0, 0, 255*(1-fraction));
     rect(-100, -100, width + 200, height + 200);
   }
 }
 
+void showMenuScreen() {
+  switch (menuScreen) {
+  case 0 : 
+    { // main menu
+      imageMode(CENTER);
+      int wi = titleImage.width;
+      int hi= titleImage.height;
+      float scale = (height/3f) / titleImage.height ;
+
+      image(titleImage, width/2, height/2 - titleImage.height*scale * 5 / 8, scale*wi, scale*hi);
+
+      for (int i=0; i < 5;i++)
+        button[i].draw();
+      break;
+    }
+  case 2 : 
+    {  // instructions
+      imageMode(CENTER);
+      float scale = height / 850f;
+      image(instructions, width/2, height/2 - instructions.height*scale, scale*instructions.width, scale*instructions.height);
+      howtoAnim.draw();
+      button[5].draw();
+      break;
+    }
+  case 3: 
+    { // credits
+      imageMode(CENTER);
+      float scale = height / 850f;
+      image(creditsTitle, width/2, height*1/8, creditsTitle.width * scale, creditsTitle.height * scale);
+      image(creditsNames, width/2, height/2, scale*creditsNames.width, scale*creditsNames.height);
+      button[5].draw();
+      break;
+    }
+  }
+}
+/*
 void mousePressed() {
+ managePressed(mouseX, mouseY);
+ }
+ */
+void managePressed(int mX, int mY) {
   int i;
-  PVector mouse = new PVector(mouseX, mouseY);
+  PVector mouse = new PVector(mX, mY);
   if (gameState == -1) {
-    for (i=0; i<3;i++)
-      if (button[i].pressed(mouse)) {
-        playerCount=i+2;
-        gameState=0;
+    if (menuScreen == 0) {
+      for (i=0; i<3;i++)
+        if (button[i].pressed(mouse)) {
+          playerCount=i+2;
+          gameState=0;
+        }
+      if (button[3].pressed(mouse)) {
+        menuScreen = 2;
+        howtoAnim.restart();
       }
+      if (button[4].pressed(mouse)) {
+        menuScreen = 3;
+      }
+    } 
+    else if (menuScreen == 2 || menuScreen == 3) {
+      if (button[5].pressed(mouse)) {
+        menuScreen = 0;
+      }
+    }
   }
   else if (gameState == 0) {
     for (int j=0; j<4;j++)
       if (initRects[j].pressed(mouse)) {
         initRects[j].selected = !initRects[j].selected;
+        if (initRects[j].selected)
+          playSuccess(j);
+        else
+          playFail(j);
         if (initRects[j].selected)
           ready++;
         else ready--;
@@ -286,12 +372,12 @@ void mousePressed() {
   if (gameState == 1) {
 
     if (baseShape == 1) { // diamonds: rotate board 45 degrees
-		PVector offs = new PVector(width/2, height/2);
-		mouse.sub(offs);		
-		mouse.mult(1/boardScale);
-		mouse.rotate(PI/4.0);
-		mouse.add(offs);		
-	}
+      PVector offs = new PVector(width/2, height/2);
+      mouse.sub(offs);		
+      mouse.mult(1/boardScale);
+      mouse.rotate(PI/4.0);
+      mouse.add(offs);
+    }
     for (i=0;i < totalGridSz;i++) 
       if (rects[i].pressed(mouse)) {
         process(rects[i]);
@@ -322,6 +408,7 @@ void process(Rect rect) {
     if (seq.completed()) {
       //allRectsSuccess(rect.player);
       rect.showSuccess();
+      playSuccess(pl);
       players[pl].score++;
       createSequence(pl);
     }
@@ -354,6 +441,11 @@ void allRectsFail( int player ) {
       rects[i].showFail();
 }
 
+void allRectsBlink() {
+  for (int i=0; i<rects.length; i++)
+    rects[i].showSuccess();
+}
+
 void computeWinner() {
   winner = 0;
   int winnercount = -1;
@@ -370,20 +462,17 @@ void setGameState(int newState) {
   if (newState == 2) {
     computeWinner();
   }
-  
+
   if (newState == -1) {
     resetColorSelection();
   }
 }
 
-/*
-public boolean surfaceTouchEvent(MotionEvent event) {
+public void onDestroy() {
 
-  //call to keep mouseX, mouseY, etc updated
-  super.surfaceTouchEvent(event);
-
-  //forward event to class for processing
-  return gesture.surfaceTouchEvent(event);
+  super.onDestroy(); //call onDestroy on super class
+  if (soundPool!=null) { //must be checked because or else crash when return from landscape mode
+    soundPool.release(); //release the player
+  }
 }
-*/
 
