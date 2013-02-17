@@ -173,7 +173,7 @@ void loadAnimation() {
   int[] delayMultipl = {8,4,4,4,4,4,4,4,1,1,1,1,1,1,12,4,4,4,4,4, 4, 8 };
 
   // animation
-  howtoAnim = new Animation(width/2, height * 0.6, height / 1600f, 500);
+  howtoAnim = new Animation(width/2, height * 0.6, height / 800f, 500);
   for (int k=0; k < frameIndexes.length; k++) {
 	int fi = frameIndexes[k];
     String pre_zero = "0";
